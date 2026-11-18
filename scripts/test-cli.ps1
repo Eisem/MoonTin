@@ -87,7 +87,19 @@ try {
     $noCoverage = Invoke-MoonTin @('profile', 'examples/terrain.xml', '0', '0', '0', '1', '--format', 'json') 1
     Assert-Equal ($noCoverage.Stdout | ConvertFrom-Json).gaps[0].end_distance 1 'Fully uncovered profile'
 
-    Write-Output 'MoonTIN CLI integration checks passed (13 cases).'
+    $obj = Invoke-MoonTin @('export', 'examples/terrain.xml', '--local-origin') 0
+    Assert-Equal ($obj.Stdout -match '(?m)^# origin 200 100 10$') $true 'OBJ origin'
+    Assert-Equal ($obj.Stdout -match '(?m)^v 0 0 0$') $true 'OBJ local coordinate'
+    Assert-Equal ($obj.Stdout -match '(?m)^f 1 2 3$') $true 'OBJ one-based face'
+
+    $ply = Invoke-MoonTin @('export', 'examples/terrain.xml', '--format', 'ply') 0
+    Assert-Equal ($ply.Stdout -match '(?m)^element vertex 3$') $true 'PLY vertex count'
+    Assert-Equal ($ply.Stdout -match '(?m)^3 0 1 2 1 1$') $true 'PLY face mapping'
+
+    $badMesh = Invoke-MoonTin @('export', 'examples/missing-point.xml') 2
+    Assert-Equal ([string]::IsNullOrWhiteSpace($badMesh.Stdout)) $true 'Invalid mesh stdout'
+
+    Write-Output 'MoonTIN CLI integration checks passed (16 cases).'
 } finally {
     Remove-Item -LiteralPath $stderrPath, $emptyPath
     Pop-Location

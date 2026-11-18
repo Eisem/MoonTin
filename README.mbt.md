@@ -52,3 +52,11 @@ moon run cmd/main -- profile examples/terrain.xml 100.25 199.75 100.25 201.25 --
 命令接收起终点的 Northing、Easting 坐标，按沿线距离输出每个可见三角面内的线性高程区间，以及未覆盖区间。重叠或共享边上的多个三角面分别保留。`--surface NAME` 限定曲面。退出码 `0` 表示存在覆盖区段，`1` 表示整条线无覆盖，`2` 表示输入错误。
 
 曲面 JSON 摘要中的 `geometry` 汇总通过几何检查的唯一可见面，包含投影面积、三维面积和最小、最大坡度百分比。面积沿用文件线性单位的平方，重叠三角面各自计入。若计算超出浮点范围，受影响的面积汇总为 `null`，`overflow_faces` 记录局部溢出的面数。
+
+## 导出 TIN 网格
+
+```sh
+moon run cmd/main -- export examples/terrain.xml --format ply --local-origin > terrain.ply
+```
+
+支持 OBJ 和 ASCII PLY，坐标轴依次为 Easting、Northing、Elevation。导出保留可见面的顶点顺序，以曲面为单位重用同一测点。OBJ 分组和 PLY 面属性记录曲面序号，PLY 还保留面序号。`--local-origin` 减去首个可见面首点的坐标，并在文件注释记录原点。

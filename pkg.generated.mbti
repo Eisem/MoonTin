@@ -2,6 +2,8 @@
 package "eisem/moontin"
 
 // Values
+pub fn build_mesh(Terrain, surface_name? : String, local_origin? : Bool) -> TerrainMesh raise SamplingError
+
 pub fn check(String, area_tolerance? : Double, strict? : Bool, max_diagnostics? : Int, max_records? : Int) -> CheckReport raise
 
 pub fn compare_terrain(Terrain, Terrain, coordinate_tolerance? : Double, max_details? : Int) -> TerrainComparison raise ComparisonError
@@ -119,6 +121,23 @@ pub struct FaceReference {
   location : SourceLocation?
 }
 pub fn FaceReference::to_json(Self) -> Json
+
+pub struct MeshFace {
+  surface_number : Int
+  face_number : Int
+  vertices : (Int, Int, Int)
+}
+
+pub(all) enum MeshFormat {
+  Obj
+  Ply
+}
+
+pub struct MeshVertex {
+  easting : Double
+  northing : Double
+  elevation : Double
+}
 
 pub struct ParsedTerrain {
   terrain : Terrain
@@ -251,6 +270,14 @@ pub struct TerrainComparison {
 }
 pub fn TerrainComparison::changed(Self) -> Bool
 pub fn TerrainComparison::to_json(Self) -> Json
+
+pub struct TerrainMesh {
+  vertices : Array[MeshVertex]
+  faces : Array[MeshFace]
+  linear_unit : String?
+  origin : MeshVertex
+}
+pub fn TerrainMesh::encode(Self, MeshFormat) -> String
 
 // Type aliases
 
