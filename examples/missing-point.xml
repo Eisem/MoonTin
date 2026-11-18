@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LandXML xmlns="http://www.landxml.org/schema/LandXML-1.2" version="1.2">
+  <Units><Metric linearUnit="meter"/></Units>
+  <Surfaces>
+    <Surface name="Existing Ground">
+      <Definition surfType="TIN">
+        <Pnts>
+          <P id="01">100 200 10</P>
+          <P id="2">100 201 11</P>
+          <P id="3">101 200 12</P>
+        </Pnts>
+        <Faces><F>99 2 3</F></Faces>
+      </Definition>
+    </Surface>
+  </Surfaces>
+</LandXML>
+

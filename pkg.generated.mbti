@@ -1,0 +1,135 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "eisem/moontin"
+
+// Values
+pub fn check(String, area_tolerance? : Double, strict? : Bool, max_diagnostics? : Int, max_records? : Int) -> CheckReport raise
+
+pub fn parse(String) -> Terrain raise
+
+pub fn parse_records(String) -> ParsedTerrain raise
+
+pub fn validate(Terrain, area_tolerance? : Double) -> Array[Diagnostic]
+
+// Errors
+pub suberror LandXmlError {
+  InvalidLandXml(String)
+}
+
+// Types and methods
+pub struct Bounds {
+  min_northing : Double
+  max_northing : Double
+  min_easting : Double
+  max_easting : Double
+  min_elevation : Double
+  max_elevation : Double
+} derive(ToJson)
+pub fn Bounds::to_json(Self) -> Json
+
+pub struct CheckReport {
+  surfaces : Array[SurfaceSummary]
+  linear_unit : String?
+  area_tolerance : Double
+  strict : Bool
+  error_count : Int
+  warning_count : Int
+  truncated : Bool
+  record_issues : Array[RecordIssue]
+  diagnostics : Array[Diagnostic]
+}
+pub fn CheckReport::passed(Self) -> Bool
+pub fn CheckReport::to_json(Self) -> Json
+
+pub(all) struct Diagnostic {
+  rule : Rule
+  surface_number : Int
+  surface_name : String
+  face_number : Int?
+  point_ids : Array[String]
+  location : SourceLocation?
+}
+pub fn Diagnostic::to_json(Self) -> Json
+
+pub(all) struct Face {
+  vertices : (String, String, String)
+  visible : Bool
+}
+
+pub struct ParsedTerrain {
+  terrain : Terrain
+  issues : Array[RecordIssue]
+  face_numbers : Array[Array[Int]]
+}
+
+pub(all) struct Point {
+  id : String
+  northing : Double
+  easting : Double
+  elevation : Double
+}
+
+pub(all) struct RecordIssue {
+  surface_number : Int
+  surface_name : String
+  code : String
+  record_kind : String
+  record_number : Int
+  message : String
+  severity : Severity
+  location : SourceLocation
+}
+pub fn RecordIssue::to_json(Self) -> Json
+
+pub(all) enum Rule {
+  DuplicatePoint
+  MissingPoint
+  AmbiguousPoint
+  NonFinitePoint
+  RepeatedVertex
+  DegenerateFace
+  NonFiniteArea
+  DuplicateFace
+  NonManifoldEdge
+  SharedEdgeDirection
+}
+pub fn Rule::code(Self) -> String
+
+pub(all) enum Severity {
+  Error
+  Warning
+}
+pub fn Severity::label(Self) -> String
+
+pub struct SourceLocation {
+  line : Int
+  column : Int
+}
+pub fn SourceLocation::to_json(Self) -> Json
+
+pub(all) struct Surface {
+  name : String
+  points : Array[Point]
+  faces : Array[Face]
+}
+
+pub struct SurfaceSummary {
+  surface_number : Int
+  name : String
+  decoded_points : Int
+  decoded_faces : Int
+  invisible_faces : Int
+  indexed_faces : Int
+  boundary_edges : Int
+  connected_components : Int
+  bounds : Bounds?
+}
+pub fn SurfaceSummary::to_json(Self) -> Json
+
+pub(all) struct Terrain {
+  linear_unit : String?
+  surfaces : Array[Surface]
+}
+
+// Type aliases
+
+// Traits
