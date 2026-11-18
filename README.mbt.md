@@ -34,3 +34,11 @@ moon run cmd/main -- diff examples/terrain.xml examples/terrain-revised.xml --fo
 `diff` 按曲面名和测点 ID 比较两版 TIN 文件，报告新增、删除和移动的测点，以及三角面的增删、方向和可见性变化。两份文件的线性单位声明必须相同。测点 ID 重新编号会表现为删除和新增。
 
 `--coordinate-tolerance N` 为每个坐标轴设置比较容差，默认 0。`--max-details N` 限制每个曲面的明细条数，默认 1,000。退出码 `0` 表示无变化，`1` 表示有变化，`2` 表示读取、解析或比较失败。
+
+## 抽查坐标高程
+
+```sh
+moon run cmd/main -- sample examples/terrain.xml 100.25 200.25 --format json
+```
+
+按 Northing、Easting 输入坐标，返回所有覆盖该点的可见三角面与线性插值高程。坐标和结果沿用文件单位。共享边或重叠曲面可返回多条结果，使用 `--surface NAME` 限定曲面。退出码 `0` 表示有命中，`1` 表示坐标没有可见面覆盖，`2` 表示输入错误。

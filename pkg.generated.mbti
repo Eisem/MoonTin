@@ -10,6 +10,8 @@ pub fn parse(String) -> Terrain raise
 
 pub fn parse_records(String) -> ParsedTerrain raise
 
+pub fn sample_elevation(Terrain, Double, Double, surface_name? : String) -> ElevationSample raise SamplingError
+
 pub fn validate(Terrain, area_tolerance? : Double) -> Array[Diagnostic]
 
 // Errors
@@ -19,6 +21,10 @@ pub suberror ComparisonError {
 
 pub suberror LandXmlError {
   InvalidLandXml(String)
+}
+
+pub suberror SamplingError {
+  InvalidSample(String)
 }
 
 // Types and methods
@@ -56,6 +62,23 @@ pub(all) struct Diagnostic {
   related_faces : Array[FaceReference]
 }
 pub fn Diagnostic::to_json(Self) -> Json
+
+pub struct ElevationHit {
+  surface_number : Int
+  surface_name : String
+  face_number : Int
+  elevation : Double
+  point_ids : Array[String]
+}
+pub fn ElevationHit::to_json(Self) -> Json
+
+pub struct ElevationSample {
+  northing : Double
+  easting : Double
+  linear_unit : String?
+  hits : Array[ElevationHit]
+}
+pub fn ElevationSample::to_json(Self) -> Json
 
 pub(all) struct Face {
   vertices : (String, String, String)

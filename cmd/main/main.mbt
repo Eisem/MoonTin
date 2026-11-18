@@ -156,11 +156,16 @@ async fn main {
   let status = try {
     match @env.args() {
       [_, "check", path, .. options] => check_file(path, parse_options(options))
+      [_, "sample", path, north, east, .. options] =>
+        sample_file(path, north, east, parse_sample_options(options))
       [_, "diff", before, after, .. options] =>
         diff_files(before, after, parse_diff_options(options))
       _ => {
         eprintln(
           "Usage: moontin check <terrain.xml> [--format text|json] [--area-tolerance N] [--strict] [--max-diagnostics N] [--max-input-bytes N] [--max-records N]",
+        )
+        eprintln(
+          "       moontin sample <terrain.xml> <northing> <easting> [--surface NAME] [--format text|json]",
         )
         eprintln(
           "       moontin diff <before.xml> <after.xml> [--format text|json] [--coordinate-tolerance N] [--max-details N] [--max-input-bytes N]",
@@ -169,6 +174,10 @@ async fn main {
       }
     }
   } catch {
+    @moontin.InvalidSample(message) => {
+      eprintln("moontin: \{message}")
+      2
+    }
     @moontin.InvalidLandXml(message)
     | @moontin.InvalidComparison(message)
     | InvalidOption(message) => {

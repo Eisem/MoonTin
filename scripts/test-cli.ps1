@@ -65,7 +65,17 @@ try {
     $incompatible = Invoke-MoonTin @('diff', 'examples/terrain.xml', 'examples/missing-point.xml') 2
     Assert-Equal ($incompatible.Stderr -match 'missing point') $true 'Invalid comparison input'
 
-    Write-Output 'MoonTIN CLI integration checks passed (8 cases).'
+    $sample = Invoke-MoonTin @('sample', 'examples/terrain.xml', '100.25', '200.25', '--format', 'json') 0
+    $sampleReport = $sample.Stdout | ConvertFrom-Json
+    Assert-Equal $sampleReport.hits[0].elevation 10.75 'Interpolated elevation'
+
+    $outside = Invoke-MoonTin @('sample', 'examples/terrain.xml', '0', '0', '--format', 'json') 1
+    Assert-Equal ($outside.Stdout | ConvertFrom-Json).hits.Count 0 'Out-of-coverage sample'
+
+    $unknownSurface = Invoke-MoonTin @('sample', 'examples/terrain.xml', '100', '200', '--surface', 'unknown') 2
+    Assert-Equal ($unknownSurface.Stderr -match 'was not found') $true 'Missing sample surface'
+
+    Write-Output 'MoonTIN CLI integration checks passed (11 cases).'
 } finally {
     Remove-Item -LiteralPath $stderrPath, $emptyPath
     Pop-Location
