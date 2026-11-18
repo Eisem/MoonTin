@@ -21,19 +21,20 @@ fn SurfaceTopology::add_face(
   vertices : (String, String, String),
   face_number : Int,
   emit : (Rule, Int?, Array[String], Array[Int]) -> Unit,
-) -> Unit {
+) -> Bool {
   let (a, b, c) = vertices
   let ids = [a, b, c]
   ids.sort()
   let key = (ids[0], ids[1], ids[2])
   if self.faces.get(key) is Some(first) {
     emit(DuplicateFace, Some(face_number), ids, [first])
-    return
+    return false
   }
   self.faces[key] = face_number
   self.add_edge(a, b, face_number)
   self.add_edge(b, c, face_number)
   self.add_edge(c, a, face_number)
+  true
 }
 
 ///|

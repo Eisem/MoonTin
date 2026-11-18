@@ -31,6 +31,8 @@ try {
     $validReport = $valid.Stdout | ConvertFrom-Json
     Assert-Equal $validReport.status 'passed' 'Valid sample status'
     Assert-Equal $validReport.surfaces[0].boundary_edges 3 'Valid sample edge count'
+    Assert-Equal $validReport.surfaces[0].geometry.projected_area 0.5 'Valid sample projected area'
+    Assert-Equal $validReport.surfaces[0].geometry.measured_faces 1 'Valid sample measured face count'
     Assert-Equal ([string]::IsNullOrWhiteSpace($valid.Stderr)) $true 'Valid sample stderr'
 
     $invalid = Invoke-MoonTin @('check', 'examples/missing-point.xml', '--format', 'json') 1

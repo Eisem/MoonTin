@@ -84,6 +84,7 @@ fn validate_surface(
   let points : Map[String, Point] = Map([])
   let ambiguous : Map[String, Bool] = Map([])
   let topology = SurfaceTopology::new()
+  let geometry = GeometryAccumulator::new()
   let emit_face = fn(rule, face_number, point_ids, related : Array[Int]) {
     let location = match (locations, face_number) {
       (Some(source), Some(number)) => source.faces.get(number)
@@ -170,8 +171,8 @@ fn validate_surface(
               add(NonFiniteArea, number, ids)
             } else if area <= area_tolerance {
               add(DegenerateFace, number, ids)
-            } else {
-              topology.add_face(face.vertices, face_number, emit_face)
+            } else if topology.add_face(face.vertices, face_number, emit_face) {
+              geometry.add_face(first, second, third, area)
             }
           }
         _ => ()
@@ -181,7 +182,14 @@ fn validate_surface(
   topology.check_edges(emit_face)
   let boundary = topology.check_boundary(emit_face)
   summarize_surface(
-    surface, surface_number, points, ambiguous, topology, visible_face_count, boundary,
+    surface,
+    surface_number,
+    points,
+    ambiguous,
+    topology,
+    visible_face_count,
+    boundary,
+    geometry.summarize(),
   )
 }
 

@@ -26,6 +26,7 @@ pub struct SurfaceSummary {
   branched_boundaries : Int
   connected_components : Int
   bounds : Bounds?
+  geometry : FaceGeometry
 }
 
 ///|
@@ -37,6 +38,7 @@ fn summarize_surface(
   topology : SurfaceTopology,
   visible_face_count : Int,
   boundary : BoundarySummary,
+  geometry : FaceGeometry,
 ) -> SurfaceSummary {
   let mut bounds : Bounds? = None
   let mut usable_points = 0
@@ -82,6 +84,7 @@ fn summarize_surface(
     branched_boundaries: boundary.branched_components,
     connected_components,
     bounds,
+    geometry,
   }
 }
 
@@ -100,6 +103,7 @@ pub fn SurfaceSummary::to_json(self : SurfaceSummary) -> Json {
     "boundary_loops": self.boundary_loops.to_json(),
     "branched_boundaries": self.branched_boundaries.to_json(),
     "connected_components": self.connected_components.to_json(),
+    "geometry": self.geometry.to_json(),
     "bounds": match self.bounds {
       Some(bounds) => bounds.to_json()
       None => Json::null()

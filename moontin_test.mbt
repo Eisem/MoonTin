@@ -205,3 +205,23 @@ test "two triangles touching at one point produce a branching boundary" {
   assert_eq(report.diagnostics[0].point_ids, ["1"])
   assert_eq(report.diagnostics[0].related_faces[0].number, 2)
 }
+
+///|
+test "face geometry sums only valid unique visible triangles" {
+  let source =
+    #|<LandXML xmlns="http://www.landxml.org/schema/LandXML-1.2" version="1.2">
+    #|<Units><Metric linearUnit="meter"/></Units>
+    #|<Surfaces><Surface name="Terrain"><Definition surfType="TIN">
+    #|<Pnts><P id="1">0 0 0</P><P id="2">0 3 4</P><P id="3">2 0 0</P></Pnts>
+    #|<Faces><F>1 2 3</F><F>3 2 1</F><F i="1">3 1 2</F><F>1 2 9</F></Faces>
+    #|</Definition></Surface></Surfaces></LandXML>
+  let geometry = @moontin.check(source).surfaces[0].geometry
+  assert_eq(geometry.projected_area, Some(3.0))
+  assert_eq(geometry.surface_area, Some(5.0))
+  assert_eq(geometry.measured_faces, 1)
+  assert_eq(geometry.overflow_faces, 0)
+  assert_true(
+    geometry.max_grade_percent is Some(grade) &&
+    (grade - 400.0 / 3.0).abs() < 1.0e-10,
+  )
+}

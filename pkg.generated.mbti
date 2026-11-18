@@ -104,6 +104,16 @@ pub struct FaceChange {
 }
 pub fn FaceChange::to_json(Self) -> Json
 
+pub struct FaceGeometry {
+  projected_area : Double?
+  surface_area : Double?
+  min_grade_percent : Double?
+  max_grade_percent : Double?
+  measured_faces : Int
+  overflow_faces : Int
+}
+pub fn FaceGeometry::to_json(Self) -> Json
+
 pub struct FaceReference {
   number : Int
   location : SourceLocation?
@@ -225,6 +235,7 @@ pub struct SurfaceSummary {
   branched_boundaries : Int
   connected_components : Int
   bounds : Bounds?
+  geometry : FaceGeometry
 }
 pub fn SurfaceSummary::to_json(Self) -> Json
 
