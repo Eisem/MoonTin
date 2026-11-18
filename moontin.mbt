@@ -132,7 +132,11 @@ fn validate_surface(
       add_point(NonFinitePoint)
     }
   }
+  let mut visible_face_count = 0
   for index, face in surface.faces {
+    if face.visible {
+      visible_face_count += 1
+    }
     let face_number = match face_numbers {
       Some(numbers) => numbers[index]
       None => index + 1
@@ -174,7 +178,9 @@ fn validate_surface(
     }
   }
   topology.check_edges(emit_face)
-  summarize_surface(surface, surface_number, points, ambiguous, topology)
+  summarize_surface(
+    surface, surface_number, points, ambiguous, topology, visible_face_count,
+  )
 }
 
 ///|

@@ -42,7 +42,7 @@ async fn check_file(path : String, options : CheckOptions) -> Int {
     }
     for surface in report.surfaces {
       println(
-        "\{surface.name}: \{surface.indexed_faces} indexed face(s), \{surface.boundary_edges} boundary edge(s), \{surface.connected_components} connected component(s).",
+        "\{surface.name}: \{surface.indexed_faces} indexed face(s), \{surface.skipped_visible_faces} skipped visible face(s), \{surface.invisible_faces} invisible face(s), \{surface.boundary_edges} boundary edge(s), \{surface.connected_components} connected component(s).",
       )
     }
     let surfaces = report.surfaces.length()

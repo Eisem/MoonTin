@@ -19,6 +19,8 @@ pub struct SurfaceSummary {
   decoded_faces : Int
   invisible_faces : Int
   indexed_faces : Int
+  skipped_visible_faces : Int
+  usable_points : Int
   boundary_edges : Int
   connected_components : Int
   bounds : Bounds?
@@ -31,10 +33,13 @@ fn summarize_surface(
   points : Map[String, Point],
   ambiguous : Map[String, Bool],
   topology : SurfaceTopology,
+  visible_face_count : Int,
 ) -> SurfaceSummary {
   let mut bounds : Bounds? = None
+  let mut usable_points = 0
   points.each(fn(id, point) {
     if !ambiguous.contains(id) && point_is_finite(point) {
+      usable_points += 1
       bounds = Some(
         match bounds {
           None =>
@@ -65,14 +70,10 @@ fn summarize_surface(
     name: surface.name,
     decoded_points: surface.points.length(),
     decoded_faces: surface.faces.length(),
-    invisible_faces: surface.faces.fold(init=0, fn(count, face) {
-      if face.visible {
-        count
-      } else {
-        count + 1
-      }
-    }),
+    invisible_faces: surface.faces.length() - visible_face_count,
     indexed_faces: topology.faces.length(),
+    skipped_visible_faces: visible_face_count - topology.faces.length(),
+    usable_points,
     boundary_edges,
     connected_components,
     bounds,
@@ -88,6 +89,8 @@ pub fn SurfaceSummary::to_json(self : SurfaceSummary) -> Json {
     "decoded_faces": self.decoded_faces.to_json(),
     "invisible_faces": self.invisible_faces.to_json(),
     "indexed_faces": self.indexed_faces.to_json(),
+    "skipped_visible_faces": self.skipped_visible_faces.to_json(),
+    "usable_points": self.usable_points.to_json(),
     "boundary_edges": self.boundary_edges.to_json(),
     "connected_components": self.connected_components.to_json(),
     "bounds": match self.bounds {

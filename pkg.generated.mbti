@@ -126,6 +126,8 @@ pub struct SurfaceSummary {
   decoded_faces : Int
   invisible_faces : Int
   indexed_faces : Int
+  skipped_visible_faces : Int
+  usable_points : Int
   boundary_edges : Int
   connected_components : Int
   bounds : Bounds?

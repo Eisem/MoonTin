@@ -164,3 +164,24 @@ test "rejects deeply nested XML" {
     _ => fail("expected the XML nesting limit to be enforced")
   }
 }
+
+///|
+test "surface counts distinguish invalid visible faces from invisible faces" {
+  let source =
+    #|<LandXML xmlns="http://www.landxml.org/schema/LandXML-1.2" version="1.2">
+    #|<Units><Metric linearUnit="meter"/></Units>
+    #|<Surfaces><Surface name="Terrain"><Definition surfType="TIN">
+    #|<Pnts><P id="1">0 0 0</P><P id="2">0 1 0</P><P id="3">1 0 0</P>
+    #|<P id="4">1 1 0</P><P id="4">8 8 8</P></Pnts>
+    #|<Faces><F>1 2 3</F><F>1 2 99</F><F i="1">1 3 2</F><F>1 2</F></Faces>
+    #|</Definition></Surface></Surfaces></LandXML>
+  let report = @moontin.check(source)
+  let summary = report.surfaces[0]
+  assert_eq(summary.decoded_points, 5)
+  assert_eq(summary.usable_points, 3)
+  assert_eq(summary.decoded_faces, 3)
+  assert_eq(summary.indexed_faces, 1)
+  assert_eq(summary.skipped_visible_faces, 1)
+  assert_eq(summary.invisible_faces, 1)
+  assert_eq(report.record_issues.length(), 1)
+}
