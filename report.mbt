@@ -22,6 +22,8 @@ pub struct SurfaceSummary {
   skipped_visible_faces : Int
   usable_points : Int
   boundary_edges : Int
+  boundary_loops : Int
+  branched_boundaries : Int
   connected_components : Int
   bounds : Bounds?
 }
@@ -34,6 +36,7 @@ fn summarize_surface(
   ambiguous : Map[String, Bool],
   topology : SurfaceTopology,
   visible_face_count : Int,
+  boundary : BoundarySummary,
 ) -> SurfaceSummary {
   let mut bounds : Bounds? = None
   let mut usable_points = 0
@@ -75,6 +78,8 @@ fn summarize_surface(
     skipped_visible_faces: visible_face_count - topology.faces.length(),
     usable_points,
     boundary_edges,
+    boundary_loops: boundary.closed_loops,
+    branched_boundaries: boundary.branched_components,
     connected_components,
     bounds,
   }
@@ -92,6 +97,8 @@ pub fn SurfaceSummary::to_json(self : SurfaceSummary) -> Json {
     "skipped_visible_faces": self.skipped_visible_faces.to_json(),
     "usable_points": self.usable_points.to_json(),
     "boundary_edges": self.boundary_edges.to_json(),
+    "boundary_loops": self.boundary_loops.to_json(),
+    "branched_boundaries": self.branched_boundaries.to_json(),
     "connected_components": self.connected_components.to_json(),
     "bounds": match self.bounds {
       Some(bounds) => bounds.to_json()

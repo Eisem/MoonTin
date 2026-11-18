@@ -37,6 +37,7 @@ pub(all) enum Rule {
   DuplicateFace
   NonManifoldEdge
   SharedEdgeDirection
+  BranchingBoundary
 }
 
 ///|
@@ -178,8 +179,9 @@ fn validate_surface(
     }
   }
   topology.check_edges(emit_face)
+  let boundary = topology.check_boundary(emit_face)
   summarize_surface(
-    surface, surface_number, points, ambiguous, topology, visible_face_count,
+    surface, surface_number, points, ambiguous, topology, visible_face_count, boundary,
   )
 }
 

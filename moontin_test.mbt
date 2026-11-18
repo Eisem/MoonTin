@@ -71,6 +71,7 @@ test "counts a connected pair and one isolated face" {
   assert_true(report.passed())
   assert_eq(report.surfaces[0].connected_components, 2)
   assert_eq(report.surfaces[0].boundary_edges, 7)
+  assert_eq(report.surfaces[0].boundary_loops, 2)
 }
 
 ///|
@@ -184,4 +185,23 @@ test "surface counts distinguish invalid visible faces from invisible faces" {
   assert_eq(summary.skipped_visible_faces, 1)
   assert_eq(summary.invisible_faces, 1)
   assert_eq(report.record_issues.length(), 1)
+}
+
+///|
+test "two triangles touching at one point produce a branching boundary" {
+  let xml =
+    #|<LandXML xmlns="http://www.landxml.org/schema/LandXML-1.2" version="1.2">
+    #|<Units><Metric linearUnit="meter"/></Units>
+    #|<Surfaces><Surface name="Terrain"><Definition surfType="TIN">
+    #|<Pnts><P id="1">0 0 0</P><P id="2">0 1 0</P><P id="3">1 0 0</P>
+    #|<P id="4">0 -1 0</P><P id="5">-1 0 0</P></Pnts>
+    #|<Faces><F>1 2 3</F><F>1 4 5</F></Faces>
+    #|</Definition></Surface></Surfaces></LandXML>
+  let report = @moontin.check(xml)
+  assert_eq(report.surfaces[0].boundary_loops, 0)
+  assert_eq(report.surfaces[0].branched_boundaries, 1)
+  assert_eq(report.error_count, 1)
+  assert_eq(report.diagnostics[0].rule.code(), "branching_boundary")
+  assert_eq(report.diagnostics[0].point_ids, ["1"])
+  assert_eq(report.diagnostics[0].related_faces[0].number, 2)
 }

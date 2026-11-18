@@ -10,6 +10,7 @@ pub fn Rule::code(self : Rule) -> String {
     NonFiniteArea => "non_finite_area"
     DuplicateFace => "duplicate_face"
     NonManifoldEdge => "non_manifold_edge"
+    BranchingBoundary => "branching_boundary"
     SharedEdgeDirection => "shared_edge_direction"
   }
 }

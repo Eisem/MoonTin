@@ -98,6 +98,7 @@ pub(all) enum Rule {
   DuplicateFace
   NonManifoldEdge
   SharedEdgeDirection
+  BranchingBoundary
 }
 pub fn Rule::code(Self) -> String
 
@@ -129,6 +130,8 @@ pub struct SurfaceSummary {
   skipped_visible_faces : Int
   usable_points : Int
   boundary_edges : Int
+  boundary_loops : Int
+  branched_boundaries : Int
   connected_components : Int
   bounds : Bounds?
 }
