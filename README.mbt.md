@@ -42,3 +42,11 @@ moon run cmd/main -- sample examples/terrain.xml 100.25 200.25 --format json
 ```
 
 按 Northing、Easting 输入坐标，返回所有覆盖该点的可见三角面与线性插值高程。坐标和结果沿用文件单位。共享边或重叠曲面可返回多条结果，使用 `--surface NAME` 限定曲面。退出码 `0` 表示有命中，`1` 表示坐标没有可见面覆盖，`2` 表示输入错误。
+
+## 提取直线高程剖面
+
+```sh
+moon run cmd/main -- profile examples/terrain.xml 100.25 199.75 100.25 201.25 --format json
+```
+
+命令接收起终点的 Northing、Easting 坐标，按沿线距离输出每个可见三角面内的线性高程区间，以及未覆盖区间。重叠或共享边上的多个三角面分别保留。`--surface NAME` 限定曲面。退出码 `0` 表示存在覆盖区段，`1` 表示整条线无覆盖，`2` 表示输入错误。

@@ -75,7 +75,17 @@ try {
     $unknownSurface = Invoke-MoonTin @('sample', 'examples/terrain.xml', '100', '200', '--surface', 'unknown') 2
     Assert-Equal ($unknownSurface.Stderr -match 'was not found') $true 'Missing sample surface'
 
-    Write-Output 'MoonTIN CLI integration checks passed (11 cases).'
+    $profile = Invoke-MoonTin @('profile', 'examples/terrain.xml', '100.25', '199.75', '100.25', '201.25', '--format', 'json') 0
+    $profileReport = $profile.Stdout | ConvertFrom-Json
+    Assert-Equal $profileReport.length 1.5 'Profile length'
+    Assert-Equal $profileReport.segments[0].start_distance 0.25 'Profile entry distance'
+    Assert-Equal $profileReport.segments[0].end_elevation 11.25 'Profile exit elevation'
+    Assert-Equal $profileReport.gaps.Count 2 'Profile coverage gaps'
+
+    $noCoverage = Invoke-MoonTin @('profile', 'examples/terrain.xml', '0', '0', '0', '1', '--format', 'json') 1
+    Assert-Equal ($noCoverage.Stdout | ConvertFrom-Json).gaps[0].end_distance 1 'Fully uncovered profile'
+
+    Write-Output 'MoonTIN CLI integration checks passed (13 cases).'
 } finally {
     Remove-Item -LiteralPath $stderrPath, $emptyPath
     Pop-Location

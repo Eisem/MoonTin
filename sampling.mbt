@@ -84,6 +84,43 @@ pub fn sample_elevation(
     raise InvalidSample("query coordinates must be finite")
   }
   let hits = []
+  each_visible_triangle(terrain, surface_name, fn(triangle) {
+    if barycentric_elevation(
+        triangle.a,
+        triangle.b,
+        triangle.c,
+        northing,
+        easting,
+      )
+      is Some(elevation) {
+      hits.push({
+        surface_number: triangle.surface_number,
+        surface_name: triangle.surface_name,
+        face_number: triangle.face_number,
+        elevation,
+        point_ids: [triangle.a.id, triangle.b.id, triangle.c.id],
+      })
+    }
+  })
+  { northing, easting, linear_unit: terrain.linear_unit, hits, }
+}
+
+///|
+priv struct SamplingTriangle {
+  surface_number : Int
+  surface_name : String
+  face_number : Int
+  a : Point
+  b : Point
+  c : Point
+}
+
+///|
+fn each_visible_triangle(
+  terrain : Terrain,
+  surface_name : String?,
+  visit : (SamplingTriangle) -> Unit,
+) -> Unit raise SamplingError {
   let mut matched = false
   for index, surface in terrain.surfaces {
     if surface_name is Some(name) && name != surface.name {
@@ -107,14 +144,14 @@ pub fn sample_elevation(
           "surface '\{surface.name}': face #\{face_index + 1} references a missing point",
         )
       }
-      if face.visible &&
-        barycentric_elevation(a, b, c, northing, easting) is Some(elevation) {
-        hits.push({
+      if face.visible {
+        visit({
           surface_number: index + 1,
           surface_name: surface.name,
           face_number: face_index + 1,
-          elevation,
-          point_ids: [a_id, b_id, c_id],
+          a,
+          b,
+          c,
         })
       }
     }
@@ -122,7 +159,6 @@ pub fn sample_elevation(
   if surface_name is Some(name) && !matched {
     raise InvalidSample("surface '\{name}' was not found")
   }
-  { northing, easting, linear_unit: terrain.linear_unit, hits, }
 }
 
 ///|
