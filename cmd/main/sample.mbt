@@ -23,7 +23,7 @@ fn parse_sample_options(args : ArrayView[String]) -> SampleOptions raise {
         json = false
         continue tail
       }
-      [option, ..] => raise InvalidOption("invalid sample option: \{option}")
+      [option, ..] => raise InvalidOption("invalid option: \{option}")
     }
   }
   { surface, json, }

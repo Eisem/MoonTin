@@ -1,0 +1,5 @@
+[
+  {"id":"control-1","northing":100.25,"easting":200.25,"elevation":10.75},
+  {"id":"control-2","northing":100,"easting":201,"elevation":11.25},
+  {"id":"control-3","northing":99,"easting":200,"elevation":10}
+]

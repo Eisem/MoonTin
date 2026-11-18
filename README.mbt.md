@@ -60,3 +60,11 @@ moon run cmd/main -- export examples/terrain.xml --format ply --local-origin > t
 ```
 
 支持 OBJ 和 ASCII PLY，坐标轴依次为 Easting、Northing、Elevation。导出保留可见面的顶点顺序，以曲面为单位重用同一测点。OBJ 分组和 PLY 面属性记录曲面序号，PLY 还保留面序号。`--local-origin` 减去首个可见面首点的坐标，并在文件注释记录原点。
+
+## 批量验收测点高程
+
+```sh
+moon run cmd/main -- survey examples/terrain.xml examples/survey-points.json 0.1 --format json
+```
+
+测点文件是 JSON 数组，每项包含字符串 `id` 和数值 `northing`、`easting`、`elevation`。容差沿用地形线性单位。若多个可见面覆盖同一测点，所有插值高程都须落在容差内。报告按输入顺序记录每个点的覆盖数、插值范围和偏差最大的面。退出码 `0` 表示全部通过，`1` 表示存在超差或无覆盖测点，`2` 表示输入错误。

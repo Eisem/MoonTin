@@ -6,6 +6,8 @@ pub fn build_mesh(Terrain, surface_name? : String, local_origin? : Bool) -> Terr
 
 pub fn check(String, area_tolerance? : Double, strict? : Bool, max_diagnostics? : Int, max_records? : Int) -> CheckReport raise
 
+pub fn check_survey_points(Terrain, ArrayView[SurveyPoint], Double, surface_name? : String) -> SurveyReport raise SamplingError
+
 pub fn compare_terrain(Terrain, Terrain, coordinate_tolerance? : Double, max_details? : Int) -> TerrainComparison raise ComparisonError
 
 pub fn elevation_profile(Terrain, (Double, Double), (Double, Double), surface_name? : String) -> ElevationProfile raise SamplingError
@@ -257,6 +259,42 @@ pub struct SurfaceSummary {
   geometry : FaceGeometry
 }
 pub fn SurfaceSummary::to_json(Self) -> Json
+
+pub(all) struct SurveyPoint {
+  id : String
+  northing : Double
+  easting : Double
+  elevation : Double
+}
+
+pub struct SurveyReport {
+  linear_unit : String?
+  tolerance : Double
+  passed_count : Int
+  outside_tolerance_count : Int
+  uncovered_count : Int
+  results : Array[SurveyResult]
+}
+pub fn SurveyReport::passed(Self) -> Bool
+pub fn SurveyReport::to_json(Self) -> Json
+
+pub struct SurveyResult {
+  point : SurveyPoint
+  status : SurveyStatus
+  hit_count : Int
+  min_elevation : Double?
+  max_elevation : Double?
+  worst_hit : ElevationHit?
+  max_absolute_error : Double?
+}
+pub fn SurveyResult::to_json(Self) -> Json
+
+pub(all) enum SurveyStatus {
+  Passed
+  OutsideTolerance
+  Uncovered
+}
+pub fn SurveyStatus::label(Self) -> String
 
 pub(all) struct Terrain {
   linear_unit : String?

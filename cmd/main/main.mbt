@@ -155,6 +155,8 @@ fn parse_options(args : ArrayView[String]) -> CheckOptions raise {
 async fn main {
   let status = try {
     match @env.args() {
+      [_, "survey", terrain, points, tolerance, .. options] =>
+        survey_file(terrain, points, tolerance, parse_sample_options(options))
       [_, "export", path, .. options] =>
         export_mesh(path, parse_mesh_options(options))
       [_, "check", path, .. options] => check_file(path, parse_options(options))
@@ -183,6 +185,9 @@ async fn main {
       _ => {
         eprintln(
           "Usage: moontin check <terrain.xml> [--format text|json] [--area-tolerance N] [--strict] [--max-diagnostics N] [--max-input-bytes N] [--max-records N]",
+        )
+        eprintln(
+          "       moontin survey <terrain.xml> <points.json> <tolerance> [--surface NAME] [--format text|json]",
         )
         eprintln(
           "       moontin export <terrain.xml> [--surface NAME] [--format obj|ply] [--local-origin]",

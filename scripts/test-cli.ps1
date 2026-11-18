@@ -99,7 +99,17 @@ try {
     $badMesh = Invoke-MoonTin @('export', 'examples/missing-point.xml') 2
     Assert-Equal ([string]::IsNullOrWhiteSpace($badMesh.Stdout)) $true 'Invalid mesh stdout'
 
-    Write-Output 'MoonTIN CLI integration checks passed (16 cases).'
+    $survey = Invoke-MoonTin @('survey', 'examples/terrain.xml', 'examples/survey-points.json', '0.1', '--format', 'json') 1
+    $surveyReport = $survey.Stdout | ConvertFrom-Json
+    Assert-Equal $surveyReport.passed_count 1 'Survey accepted count'
+    Assert-Equal $surveyReport.outside_tolerance_count 1 'Survey failed count'
+    Assert-Equal $surveyReport.uncovered_count 1 'Survey uncovered count'
+    Assert-Equal $surveyReport.results[1].max_absolute_error 0.25 'Survey maximum error'
+
+    $badSurvey = Invoke-MoonTin @('survey', 'examples/terrain.xml', 'examples/terrain.xml', '0.1') 2
+    Assert-Equal ($badSurvey.Stderr -match 'invalid survey points JSON') $true 'Malformed survey file'
+
+    Write-Output 'MoonTIN CLI integration checks passed (18 cases).'
 } finally {
     Remove-Item -LiteralPath $stderrPath, $emptyPath
     Pop-Location

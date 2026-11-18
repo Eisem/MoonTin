@@ -225,3 +225,28 @@ test "face geometry sums only valid unique visible triangles" {
     (grade - 400.0 / 3.0).abs() < 1.0e-10,
   )
 }
+
+///|
+test "survey rejects a control point if any overlapping face is outside tolerance" {
+  let source =
+    #|<LandXML xmlns="http://www.landxml.org/schema/LandXML-1.2" version="1.2">
+    #|<Surfaces><Surface name="Lower"><Definition surfType="TIN">
+    #|<Pnts><P id="1">0 0 10</P><P id="2">0 1 10</P><P id="3">1 0 10</P></Pnts>
+    #|<Faces><F>1 2 3</F></Faces></Definition></Surface>
+    #|<Surface name="Upper"><Definition surfType="TIN">
+    #|<Pnts><P id="1">0 0 11</P><P id="2">0 1 11</P><P id="3">1 0 11</P></Pnts>
+    #|<Faces><F>1 2 3</F></Faces></Definition></Surface></Surfaces></LandXML>
+  let terrain = @moontin.parse(source)
+  let points : Array[@moontin.SurveyPoint] = [
+    { id: "control", northing: 0.25, easting: 0.25, elevation: 10.0, },
+  ]
+  let result = @moontin.check_survey_points(terrain, points[:], 0.5).results[0]
+  assert_true(result.status is OutsideTolerance)
+  assert_eq(result.hit_count, 2)
+  assert_eq(result.min_elevation, Some(10.0))
+  assert_eq(result.max_elevation, Some(11.0))
+  assert_true(result.worst_hit is Some(hit) && hit.surface_name == "Upper")
+  assert_true(
+    @moontin.check_survey_points(terrain, points[:], 0.5, surface_name="Lower").passed(),
+  )
+}
