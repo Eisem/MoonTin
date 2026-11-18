@@ -26,6 +26,9 @@ pub fn Diagnostic::to_json(self : Diagnostic) -> Json {
       None => Json::null()
     },
     "point_ids": self.point_ids.to_json(),
+    "related_faces": self.related_faces
+    .map(fn(face) { face.to_json() })
+    .to_json(),
     "location": match self.location {
       Some(location) => location.to_json()
       None => Json::null()
@@ -48,4 +51,21 @@ pub fn SourceLocation::to_json(self : SourceLocation) -> Json {
 priv struct SurfaceLocations {
   points : Array[SourceLocation]
   faces : Map[Int, SourceLocation]
+}
+
+///|
+pub struct FaceReference {
+  number : Int
+  location : SourceLocation?
+}
+
+///|
+pub fn FaceReference::to_json(self : FaceReference) -> Json {
+  {
+    "number": self.number.to_json(),
+    "location": match self.location {
+      Some(location) => location.to_json()
+      None => Json::null()
+    },
+  }
 }

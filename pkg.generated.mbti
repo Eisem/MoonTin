@@ -47,6 +47,7 @@ pub(all) struct Diagnostic {
   face_number : Int?
   point_ids : Array[String]
   location : SourceLocation?
+  related_faces : Array[FaceReference]
 }
 pub fn Diagnostic::to_json(Self) -> Json
 
@@ -54,6 +55,12 @@ pub(all) struct Face {
   vertices : (String, String, String)
   visible : Bool
 }
+
+pub struct FaceReference {
+  number : Int
+  location : SourceLocation?
+}
+pub fn FaceReference::to_json(Self) -> Json
 
 pub struct ParsedTerrain {
   terrain : Terrain

@@ -47,6 +47,7 @@ pub(all) struct Diagnostic {
   face_number : Int?
   point_ids : Array[String]
   location : SourceLocation?
+  related_faces : Array[FaceReference]
 }
 
 ///|
@@ -82,7 +83,7 @@ fn validate_surface(
   let points : Map[String, Point] = Map([])
   let ambiguous : Map[String, Bool] = Map([])
   let topology = SurfaceTopology::new()
-  let add = fn(rule, face_number, point_ids) {
+  let emit_face = fn(rule, face_number, point_ids, related : Array[Int]) {
     let location = match (locations, face_number) {
       (Some(source), Some(number)) => source.faces.get(number)
       _ => None
@@ -94,7 +95,19 @@ fn validate_surface(
       face_number,
       point_ids,
       location,
+      related_faces: related.map(fn(number) {
+        {
+          number,
+          location: match locations {
+            Some(source) => source.faces.get(number)
+            None => None
+          },
+        }
+      }),
     })
+  }
+  let add = fn(rule, face_number, point_ids) {
+    emit_face(rule, face_number, point_ids, [])
   }
   for index, point in surface.points {
     let location = locations.map(fn(source) { source.points[index] })
@@ -106,6 +119,7 @@ fn validate_surface(
         face_number: None,
         point_ids: [point.id],
         location,
+        related_faces: [],
       })
     }
     if points.contains(point.id) {
@@ -152,14 +166,14 @@ fn validate_surface(
             } else if area <= area_tolerance {
               add(DegenerateFace, number, ids)
             } else {
-              topology.add_face(face.vertices, face_number, add)
+              topology.add_face(face.vertices, face_number, emit_face)
             }
           }
         _ => ()
       }
     }
   }
-  topology.check_edges(add)
+  topology.check_edges(emit_face)
   summarize_surface(surface, surface_number, points, ambiguous, topology)
 }
 

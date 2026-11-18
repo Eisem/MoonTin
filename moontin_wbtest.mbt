@@ -72,3 +72,33 @@ test "reports inconsistent direction on a shared edge" {
   assert_true(diagnostics[0].point_ids.contains("01"))
   assert_true(diagnostics[0].point_ids.contains("2"))
 }
+
+///|
+test "nonmanifold edge lists other faces and duplicate identifies first face" {
+  let terrain = sample_terrain(("01", "2", "3"))
+  let surface = terrain.surfaces[0]
+  surface.points.push({
+    id: "4",
+    northing: 99.0,
+    easting: 201.0,
+    elevation: 12.0,
+  })
+  surface.points.push({
+    id: "5",
+    northing: 102.0,
+    easting: 200.0,
+    elevation: 10.0,
+  })
+  surface.faces.push({ vertices: ("2", "01", "4"), visible: true, })
+  surface.faces.push({ vertices: ("01", "2", "5"), visible: true, })
+  surface.faces.push({ vertices: ("3", "01", "2"), visible: true, })
+  let issues = validate(terrain)
+  assert_eq(issues.length(), 2)
+  assert_eq(issues[0].rule.code(), "duplicate_face")
+  assert_eq(issues[0].related_faces[0].number, 1)
+  assert_eq(issues[1].rule.code(), "non_manifold_edge")
+  assert_eq(issues[1].face_number, Some(3))
+  assert_eq(issues[1].related_faces.map(fn(reference) { reference.number }), [
+    1, 2,
+  ])
+}

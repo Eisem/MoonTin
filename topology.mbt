@@ -20,14 +20,14 @@ fn SurfaceTopology::add_face(
   self : SurfaceTopology,
   vertices : (String, String, String),
   face_number : Int,
-  emit : (Rule, Int?, Array[String]) -> Unit,
+  emit : (Rule, Int?, Array[String], Array[Int]) -> Unit,
 ) -> Unit {
   let (a, b, c) = vertices
   let ids = [a, b, c]
   ids.sort()
   let key = (ids[0], ids[1], ids[2])
-  if self.faces.contains(key) {
-    emit(DuplicateFace, Some(face_number), ids)
+  if self.faces.get(key) is Some(first) {
+    emit(DuplicateFace, Some(face_number), ids, [first])
     return
   }
   self.faces[key] = face_number
@@ -55,14 +55,27 @@ fn SurfaceTopology::add_edge(
 ///|
 fn SurfaceTopology::check_edges(
   self : SurfaceTopology,
-  emit : (Rule, Int?, Array[String]) -> Unit,
+  emit : (Rule, Int?, Array[String], Array[Int]) -> Unit,
 ) -> Unit {
   self.edges.each(fn(edge, uses) {
     let (a, b) = edge
     if uses.length() > 2 {
-      emit(NonManifoldEdge, Some(uses[2].face_number), [a, b])
+      emit(
+        NonManifoldEdge,
+        Some(uses[2].face_number),
+        [a, b],
+        uses.filter_map(fn(usage) {
+          if usage.face_number == uses[2].face_number {
+            None
+          } else {
+            Some(usage.face_number)
+          }
+        }),
+      )
     } else if uses.length() == 2 && uses[0].forward == uses[1].forward {
-      emit(SharedEdgeDirection, Some(uses[1].face_number), [a, b])
+      emit(SharedEdgeDirection, Some(uses[1].face_number), [a, b], [
+        uses[0].face_number,
+      ])
     }
   })
 }

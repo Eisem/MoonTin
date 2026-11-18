@@ -28,7 +28,17 @@ async fn check_file(path : String, options : CheckOptions) -> Int {
         Some(position) => "\{path}:\{position.line}:\{position.column}: "
         None => ""
       }
-      println("\{location}\{rule}: surface \{surface}\{face} [\{ids}]")
+      let related = if diagnostic.related_faces.is_empty() {
+        ""
+      } else {
+        let numbers = diagnostic.related_faces
+          .map(fn(reference) { reference.number.to_string() })
+          .join(", ")
+        " (related faces: \{numbers})"
+      }
+      println(
+        "\{location}\{rule}: surface \{surface}\{face} [\{ids}]\{related}",
+      )
     }
     for surface in report.surfaces {
       println(
