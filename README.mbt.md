@@ -6,6 +6,7 @@ MoonTIN 检查 LandXML 1.2 地形曲面的测点引用、投影退化和三角�
 moon run cmd/main -- check examples/terrain.xml
 moon run cmd/main -- check examples/missing-point.xml --format json
 moon test --target native
+pwsh -NoProfile -File scripts/test-cli.ps1
 ```
 
 正常样本返回 `0`。悬空引用样本返回 `1`，并报告 `Existing Ground` 曲面的第 `1` 个面引用了不存在的 `99` 号点。输入、参数或文件读取错误返回 `2`。
@@ -23,4 +24,3 @@ moon test --target native
 ### 本地性能基线
 
 Windows 原生 Release 构建处理 160 × 160 合成网格。输入大小为 1,895,456 字节，含 25,600 个点、50,562 个面。一次本地运行含进程启动约 614 ms，运行期间采样到的峰值工作集约 63 MiB。结果为 636 条边界边、1 个连通片。
-
