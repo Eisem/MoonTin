@@ -4,6 +4,8 @@ package "eisem/moontin"
 // Values
 pub fn check(String, area_tolerance? : Double, strict? : Bool, max_diagnostics? : Int, max_records? : Int) -> CheckReport raise
 
+pub fn compare_terrain(Terrain, Terrain, coordinate_tolerance? : Double, max_details? : Int) -> TerrainComparison raise ComparisonError
+
 pub fn parse(String) -> Terrain raise
 
 pub fn parse_records(String) -> ParsedTerrain raise
@@ -11,6 +13,10 @@ pub fn parse_records(String) -> ParsedTerrain raise
 pub fn validate(Terrain, area_tolerance? : Double) -> Array[Diagnostic]
 
 // Errors
+pub suberror ComparisonError {
+  InvalidComparison(String)
+}
+
 pub suberror LandXmlError {
   InvalidLandXml(String)
 }
@@ -56,6 +62,15 @@ pub(all) struct Face {
   visible : Bool
 }
 
+pub struct FaceChange {
+  vertices : Array[String]
+  before_number : Int
+  after_number : Int
+  winding_changed : Bool
+  visibility_changed : Bool
+}
+pub fn FaceChange::to_json(Self) -> Json
+
 pub struct FaceReference {
   number : Int
   location : SourceLocation?
@@ -74,6 +89,13 @@ pub(all) struct Point {
   easting : Double
   elevation : Double
 }
+
+pub struct PointChange {
+  id : String
+  before : Point
+  after : Point
+}
+pub fn PointChange::to_json(Self) -> Json
 
 pub(all) struct RecordIssue {
   surface_number : Int
@@ -120,6 +142,25 @@ pub(all) struct Surface {
   faces : Array[Face]
 }
 
+pub struct SurfaceComparison {
+  name : String
+  status : String
+  added_point_count : Int
+  removed_point_count : Int
+  moved_point_count : Int
+  added_face_count : Int
+  removed_face_count : Int
+  changed_face_count : Int
+  added_points : Array[String]
+  removed_points : Array[String]
+  moved_points : Array[PointChange]
+  added_faces : Array[Array[String]]
+  removed_faces : Array[Array[String]]
+  changed_faces : Array[FaceChange]
+  truncated : Bool
+}
+pub fn SurfaceComparison::to_json(Self) -> Json
+
 pub struct SurfaceSummary {
   surface_number : Int
   name : String
@@ -141,6 +182,14 @@ pub(all) struct Terrain {
   linear_unit : String?
   surfaces : Array[Surface]
 }
+
+pub struct TerrainComparison {
+  linear_unit : String?
+  coordinate_tolerance : Double
+  surfaces : Array[SurfaceComparison]
+}
+pub fn TerrainComparison::changed(Self) -> Bool
+pub fn TerrainComparison::to_json(Self) -> Json
 
 // Type aliases
 

@@ -24,3 +24,13 @@ pwsh -NoProfile -File scripts/test-cli.ps1
 ### 本地性能基线
 
 Windows 原生 Release 构建处理 160 × 160 合成网格。输入大小为 1,895,456 字节，含 25,600 个点、50,562 个面。一次本地运行含进程启动约 614 ms，运行期间采样到的峰值工作集约 63 MiB。结果为 636 条边界边、1 个连通片。
+
+## 比较两版地形
+
+```sh
+moon run cmd/main -- diff examples/terrain.xml examples/terrain-revised.xml --format json
+```
+
+`diff` 按曲面名和测点 ID 比较两版 TIN 文件，报告新增、删除和移动的测点，以及三角面的增删、方向和可见性变化。两份文件的线性单位声明必须相同。测点 ID 重新编号会表现为删除和新增。
+
+`--coordinate-tolerance N` 为每个坐标轴设置比较容差，默认 0。`--max-details N` 限制每个曲面的明细条数，默认 1,000。退出码 `0` 表示无变化，`1` 表示有变化，`2` 表示读取、解析或比较失败。

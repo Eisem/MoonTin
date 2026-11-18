@@ -54,7 +54,18 @@ try {
     Assert-Equal $cappedReport.truncated $true 'Truncated report flag'
     Assert-Equal $cappedReport.diagnostics.Count 0 'Truncated report output count'
 
-    Write-Output 'MoonTIN CLI integration checks passed (5 cases).'
+    $same = Invoke-MoonTin @('diff', 'examples/terrain.xml', 'examples/terrain.xml', '--format', 'json') 0
+    Assert-Equal ($same.Stdout | ConvertFrom-Json).changed $false 'Identical files'
+
+    $diff = Invoke-MoonTin @('diff', 'examples/terrain.xml', 'examples/terrain-revised.xml', '--format', 'json') 1
+    $diffReport = $diff.Stdout | ConvertFrom-Json
+    Assert-Equal $diffReport.surfaces[0].moved_point_count 1 'Revised point count'
+    Assert-Equal $diffReport.surfaces[0].moved_points[0].id '2' 'Revised point ID'
+
+    $incompatible = Invoke-MoonTin @('diff', 'examples/terrain.xml', 'examples/missing-point.xml') 2
+    Assert-Equal ($incompatible.Stderr -match 'missing point') $true 'Invalid comparison input'
+
+    Write-Output 'MoonTIN CLI integration checks passed (8 cases).'
 } finally {
     Remove-Item -LiteralPath $stderrPath, $emptyPath
     Pop-Location
