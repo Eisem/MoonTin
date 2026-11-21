@@ -267,3 +267,26 @@ test "contour joins adjacent triangles across their shared edge" {
   assert_eq(path.points[1].northing, 0.5)
   assert_true(path.points.all(fn(point) { point.easting == 0.5 }))
 }
+
+///|
+test "LandXML writer preserves escaped names and hides and renumbers on request" {
+  let source =
+    #|<LandXML xmlns="http://www.landxml.org/schema/LandXML-1.2" version="1.2">
+    #|<Units><Imperial linearUnit="foot"/></Units>
+    #|<Surfaces><Surface name="A &amp; B"><Definition surfType="TIN">
+    #|<Pnts><P id="a&amp;b">0 0 0</P><P id="02">0 1 0</P><P id="3">1 0 0</P><P id="4">1 1 0</P></Pnts>
+    #|<Faces><F>a&amp;b 02 3</F><F i="1">3 02 4</F></Faces>
+    #|</Definition></Surface></Surfaces></LandXML>
+  let original = @moontin.parse(source)
+  let restored = @moontin.parse(@moontin.write_landxml(original))
+  assert_eq(restored.surfaces[0].name, "A & B")
+  assert_eq(restored.surfaces[0].points[0].id, "a&b")
+  assert_false(restored.surfaces[0].faces[1].visible)
+  assert_false(@moontin.compare_terrain(original, restored).changed())
+  let visible = @moontin.parse(
+    @moontin.write_landxml(original, visible_only=true, renumber_points=true),
+  )
+  assert_eq(visible.linear_unit, Some("foot"))
+  assert_eq(visible.surfaces[0].points.length(), 3)
+  assert_eq(visible.surfaces[0].faces[0].vertices, ("1", "2", "3"))
+}

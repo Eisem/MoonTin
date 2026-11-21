@@ -84,3 +84,11 @@ moon run cmd/main -- volume examples/terrain.xml 11 --format json
 ```
 
 默认使用指定高程的水平面。`--anchor NORTH EAST` 设置锚点，`--grade NORTH EAST` 设置两个方向的单位坡降系数，即每单位水平距离对应的高程变化。工具切分跨过基准面的可见三角面，对上下两侧分别积分，报告挖方、填方、净挖方和投影面积。方量为文件线性单位的立方。重叠曲面分别计量。
+
+## 回写 LandXML TIN
+
+```sh
+moon run cmd/main -- rewrite examples/terrain.xml --timestamp 2026-11-21 09:00:00 --project Road > normalized.xml
+```
+
+回写结果包含 MoonTIN 支持的 TIN 曲面、点、面和线性单位。默认保留测点 ID、三角面方向及可见性。`--visible-only` 移除隐藏面及其独用测点，`--renumber-points` 将每个曲面的测点重新编号为连续整数。`--timestamp DATE TIME` 和 `--project NAME` 可为交付文件补充元数据。回写的范围限于 TIN 数据，原文件的坐标参考系统、断裂线、路线及其他扩展元数据不会进入输出。往返测试验证 MoonTIN 可重读输出。

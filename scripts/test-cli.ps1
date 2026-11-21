@@ -124,7 +124,18 @@ try {
     $plane = Invoke-MoonTin @('volume', 'examples/terrain.xml', '10', '--anchor', '100', '200', '--grade', '2', '1', '--format', 'json') 0
     Assert-Equal ($plane.Stdout | ConvertFrom-Json).surfaces[0].coincident_faces 1 'Sloped reference coincident face'
 
-    Write-Output 'MoonTIN CLI integration checks passed (21 cases).'
+    $rewritten = Invoke-MoonTin @('rewrite', 'examples/terrain.xml', '--timestamp', '2024-02-29', '10:20:30', '--project', 'Road & Drainage') 0
+    [xml]$rewrittenDocument = $rewritten.Stdout
+    Assert-Equal $rewrittenDocument.LandXML.date '2024-02-29' 'LandXML export date'
+    Assert-Equal $rewrittenDocument.LandXML.Project.name 'Road & Drainage' 'Escaped project'
+    Set-Content -LiteralPath $emptyPath -Value $rewritten.Stdout -Encoding utf8
+    $roundTrip = Invoke-MoonTin @('diff', 'examples/terrain.xml', $emptyPath, '--format', 'json') 0
+    Assert-Equal ($roundTrip.Stdout | ConvertFrom-Json).changed $false 'Rewritten TIN round trip'
+
+    $badDate = Invoke-MoonTin @('rewrite', 'examples/terrain.xml', '--timestamp', '2025-02-29', '10:20:30') 2
+    Assert-Equal ($badDate.Stderr -match 'timestamp requires') $true 'Invalid LandXML date'
+
+    Write-Output 'MoonTIN CLI integration checks passed (24 cases).'
 } finally {
     Remove-Item -LiteralPath $stderrPath, $emptyPath
     Pop-Location

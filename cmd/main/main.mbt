@@ -155,6 +155,8 @@ fn parse_options(args : ArrayView[String]) -> CheckOptions raise {
 async fn main {
   let status = try {
     match @env.args() {
+      [_, "rewrite", path, .. options] =>
+        rewrite_file(path, parse_rewrite_options(options))
       [_, "volume", path, height, .. options] =>
         volume_file(path, parse_volume_options(height, options))
       [_, "contour", path, level, .. options] =>
@@ -191,6 +193,9 @@ async fn main {
           "Usage: moontin check <terrain.xml> [--format text|json] [--area-tolerance N] [--strict] [--max-diagnostics N] [--max-input-bytes N] [--max-records N]",
         )
         eprintln(
+          "       moontin rewrite <terrain.xml> [--surface NAME] [--visible-only] [--renumber-points] [--timestamp DATE TIME] [--project NAME] [--description TEXT]",
+        )
+        eprintln(
           "       moontin volume <terrain.xml> <elevation> [--anchor NORTH EAST] [--grade NORTH EAST] [--surface NAME] [--format text|json]",
         )
         eprintln(
@@ -221,6 +226,7 @@ async fn main {
     }
     @moontin.InvalidLandXml(message)
     | @moontin.InvalidComparison(message)
+    | @moontin.InvalidTerrainOutput(message)
     | InvalidOption(message) => {
       eprintln("moontin: \{message}")
       2

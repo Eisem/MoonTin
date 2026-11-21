@@ -24,6 +24,8 @@ pub fn sample_elevation(Terrain, Double, Double, surface_name? : String) -> Elev
 
 pub fn validate(Terrain, area_tolerance? : Double) -> Array[Diagnostic]
 
+pub fn write_landxml(Terrain, surface_name? : String, visible_only? : Bool, renumber_points? : Bool, metadata? : LandXmlMetadata) -> String raise
+
 // Errors
 pub suberror ComparisonError {
   InvalidComparison(String)
@@ -35,6 +37,10 @@ pub suberror LandXmlError {
 
 pub suberror SamplingError {
   InvalidSample(String)
+}
+
+pub suberror TerrainWriteError {
+  InvalidTerrainOutput(String)
 }
 
 // Types and methods
@@ -150,6 +156,13 @@ pub struct FaceReference {
   location : SourceLocation?
 }
 pub fn FaceReference::to_json(Self) -> Json
+
+pub(all) struct LandXmlMetadata {
+  date : String?
+  time : String?
+  project : String?
+  description : String?
+}
 
 pub struct MeshFace {
   surface_number : Int
