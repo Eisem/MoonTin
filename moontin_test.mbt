@@ -290,3 +290,29 @@ test "LandXML writer preserves escaped names and hides and renumbers on request"
   assert_eq(visible.surfaces[0].points.length(), 3)
   assert_eq(visible.surfaces[0].faces[0].vertices, ("1", "2", "3"))
 }
+
+///|
+test "ignores unrelated subtrees but reports nested elements in TIN records" {
+  let xml =
+    #|<LandXML xmlns="http://www.landxml.org/schema/LandXML-1.2" version="1.2">
+    #|<Units><Metric linearUnit="meter"/></Units>
+    #|<Feature><Surfaces><Surface name="Ignored"><Definition surfType="TIN"/></Surface></Surfaces></Feature>
+    #|<Surfaces><Surface name="Terrain"><Definition surfType="TIN">
+    #|<Pnts><P id="a">0 0 0</P><P id="b">0 1 0</P><P id="c">1 0 0</P></Pnts>
+    #|<Faces><F>a b c<ext:Note xmlns:ext="urn:extension"/></F><F>a b c</F></Faces>
+    #|</Definition></Surface></Surfaces></LandXML>
+  let report = @moontin.check(xml)
+  assert_eq(report.surfaces.length(), 1)
+  assert_eq(report.surfaces[0].indexed_faces, 1)
+  assert_eq(report.error_count, 1)
+  assert_eq(report.record_issues[0].record_number, 1)
+  assert_true(
+    report.record_issues[0].message.contains("unexpected XML inside face"),
+  )
+  let broken = xml.replace(old="<Feature>", new="<Different>")
+  try @moontin.check(broken) catch {
+    _ => ()
+  } noraise {
+    _ => fail("expected invalid XML in unrelated data to be rejected")
+  }
+}

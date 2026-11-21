@@ -7,9 +7,10 @@ pub suberror LandXmlError {
 priv struct XmlNode {
   name : String
   location : SourceLocation
-  attributes : Map[String, String]
+  attributes : Array[@xml.NamespaceAttribute]
   children : Array[XmlNode]
-  text : StringBuilder
+  mut text : StringBuilder?
+  mut has_child_elements : Bool
 }
 
 ///|
@@ -20,12 +21,6 @@ fn xml_node(
   element : @xml.NamespaceElement,
   start : @xml.SourcePosition,
 ) -> XmlNode {
-  let attributes = Map([])
-  for attribute in element.attributes {
-    if attribute.name.namespace_uri is None {
-      attributes[attribute.name.local_name] = attribute.value
-    }
-  }
   {
     name: if element.name.namespace_uri == Some(LANDXML_NAMESPACE) {
       element.name.local_name
@@ -33,9 +28,55 @@ fn xml_node(
       ""
     },
     location: { line: start.line, column: start.column, },
-    attributes,
+    attributes: element.attributes,
     children: [],
-    text: StringBuilder(),
+    text: None,
+    has_child_elements: false,
+  }
+}
+
+///|
+fn XmlNode::attribute(self : XmlNode, name : String) -> String? {
+  for attribute in self.attributes {
+    if attribute.name.namespace_uri is None && attribute.name.local_name == name {
+      return Some(attribute.value)
+    }
+  }
+  None
+}
+
+///|
+fn XmlNode::record_text(self : XmlNode) -> String {
+  match self.text {
+    Some(buffer) => buffer.to_string()
+    None => ""
+  }
+}
+
+///|
+/// The namespace reader still consumes and checks the entire document.
+/// Only nodes reachable through the supported TIN paths need to be retained.
+fn retain_xml_node(
+  stack : Array[XmlNode?],
+  element : @xml.NamespaceElement,
+) -> Bool {
+  if stack.is_empty() {
+    return true
+  }
+  guard stack.last() is Some(Some(parent)) else { return false }
+  parent.has_child_elements = true
+  if element.name.namespace_uri != Some(LANDXML_NAMESPACE) {
+    return false
+  }
+  match (parent.name, element.name.local_name) {
+    ("LandXML", "Units" | "Surfaces")
+    | ("Units", "Metric" | "Imperial")
+    | ("Surfaces", "Surface")
+    | ("Surface", "Definition")
+    | ("Definition", "Pnts" | "Faces")
+    | ("Pnts", "P")
+    | ("Faces", "F") => true
+    _ => false
   }
 }
 
@@ -45,7 +86,7 @@ fn read_xml(source : String, max_records : Int) -> XmlNode raise {
     raise InvalidLandXml("DOCTYPE declarations are unsupported")
   }
   let reader = @xml.NamespaceReader::from_string(source)
-  let stack : Array[XmlNode] = []
+  let stack : Array[XmlNode?] = []
   let mut root = None
   let mut records = 0
   let count_record = fn(element : @xml.NamespaceElement) raise {
@@ -68,28 +109,48 @@ fn read_xml(source : String, max_records : Int) -> XmlNode raise {
     match event.kind {
       Start(element) => {
         count_record(element)
-        stack.push(xml_node(element, event.span.start))
+        let node = if retain_xml_node(stack, element) {
+          Some(xml_node(element, event.span.start))
+        } else {
+          None
+        }
+        stack.push(node)
       }
       Empty(element) => {
         count_record(element)
+        if !retain_xml_node(stack, element) {
+          continue
+        }
         let node = xml_node(element, event.span.start)
         match stack.last() {
-          Some(parent) => parent.children.push(node)
+          Some(Some(parent)) => parent.children.push(node)
+          Some(None) => ()
           None => root = Some(node)
         }
       }
       End(_) => {
-        guard stack.pop() is Some(node) else {
+        guard stack.pop() is Some(retained) else {
           raise InvalidLandXml("unexpected closing tag")
         }
+        guard retained is Some(node) else { continue }
         match stack.last() {
-          Some(parent) => parent.children.push(node)
+          Some(Some(parent)) => parent.children.push(node)
+          Some(None) => ()
           None => root = Some(node)
         }
       }
       Text(value) | CData(value) =>
-        if stack.last() is Some(node) && (node.name == "P" || node.name == "F") {
-          node.text.write_string(value)
+        if stack.last() is Some(Some(node)) &&
+          (node.name == "P" || node.name == "F") {
+          let buffer = match node.text {
+            Some(buffer) => buffer
+            None => {
+              let buffer = StringBuilder()
+              node.text = Some(buffer)
+              buffer
+            }
+          }
+          buffer.write_string(value)
         }
       Eof => break
       _ => ()
@@ -134,18 +195,18 @@ fn tokens(text : String) -> Array[String] {
 ///|
 fn decode_point(node : XmlNode, surface : String, number : Int) -> Point raise {
   let location = "surface \{surface}, point #\{number}"
-  if node.attributes.contains("pntRef") {
+  if node.attribute("pntRef") is Some(_) {
     raise InvalidLandXml(
       "\{location}: external point references are unsupported",
     )
   }
-  guard node.children.is_empty() else {
+  guard !node.has_child_elements else {
     raise InvalidLandXml("\{location}: unexpected XML inside point record")
   }
-  guard node.attributes.get("id") is Some(id) && !id.is_empty() else {
+  guard node.attribute("id") is Some(id) && !id.is_empty() else {
     raise InvalidLandXml("\{location}: missing point ID")
   }
-  guard tokens(node.text.to_string()) is [north, east, elevation] else {
+  guard tokens(node.record_text()) is [north, east, elevation] else {
     raise InvalidLandXml(
       "\{location}: expected northing, easting and elevation",
     )
@@ -163,13 +224,13 @@ fn decode_point(node : XmlNode, surface : String, number : Int) -> Point raise {
 ///|
 fn decode_face(node : XmlNode, surface : String, number : Int) -> Face raise {
   let location = "surface \{surface}, face #\{number}"
-  guard node.children.is_empty() else {
+  guard !node.has_child_elements else {
     raise InvalidLandXml("\{location}: unexpected XML inside face record")
   }
-  guard tokens(node.text.to_string()) is [a, b, c] else {
+  guard tokens(node.record_text()) is [a, b, c] else {
     raise InvalidLandXml("\{location}: expected three point IDs")
   }
-  let visible = match node.attributes.get("i") {
+  let visible = match node.attribute("i") {
     None | Some("0") => true
     Some("1") => false
     Some(value) =>
@@ -224,14 +285,14 @@ fn decode_records(
   emit : (RecordIssue) -> Unit,
 ) -> (Terrain, Array[Array[Int]], Array[Int], Array[SurfaceLocations]) raise {
   let root = read_xml(source, max_records)
-  guard root.name == "LandXML" && root.attributes.get("version") == Some("1.2") else {
+  guard root.name == "LandXML" && root.attribute("version") == Some("1.2") else {
     raise InvalidLandXml("expected a LandXML 1.2 document")
   }
   let mut linear_unit = None
   for unit_group in children(root, "Units") {
     for unit in unit_group.children {
       if unit.name == "Metric" || unit.name == "Imperial" {
-        linear_unit = unit.attributes.get("linearUnit")
+        linear_unit = unit.attribute("linearUnit")
       }
     }
   }
@@ -255,9 +316,9 @@ fn decode_records(
   for group in children(root, "Surfaces") {
     for surface in children(group, "Surface") {
       ordinal += 1
-      let name = surface.attributes.get("name").unwrap_or("(unnamed)")
+      let name = surface.attribute("name").unwrap_or("(unnamed)")
       let definitions = children(surface, "Definition").filter(fn(item) {
-        item.attributes.get("surfType") == Some("TIN")
+        item.attribute("surfType") == Some("TIN")
       })
       if definitions.is_empty() {
         emit({
@@ -286,7 +347,7 @@ fn decode_records(
         continue
       }
       for definition in definitions {
-        if definition.attributes.get("surfType") != Some("TIN") {
+        if definition.attribute("surfType") != Some("TIN") {
           continue
         }
         let points = []
