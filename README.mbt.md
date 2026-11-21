@@ -25,6 +25,10 @@ pwsh -NoProfile -File scripts/test-cli.ps1
 
 Windows 原生 Release 构建处理 160 × 160 合成网格。输入大小为 1,895,456 字节，含 25,600 个点、50,562 个面。一次本地运行含进程启动约 614 ms，运行期间采样到的峰值工作集约 63 MiB。结果为 636 条边界边、1 个连通片。
 
+在单曲面样本中加入 90,000 个无关 `CgPoint` 元素后，文件大小约 3.77 MB。Windows Release 交替运行五次，优化前后 JSON 报告逐字节一致。中位耗时由 509 ms 降至 465 ms，采样峰值工作集由 78.1 MiB 降至 33.9 MiB。上述数据适用于该合成输入和本地环境。
+
+同一 160 × 160 合成网格用于对比连通片统计。Windows Release 交替运行五次，改用并查集后 JSON 报告逐字节一致，中位耗时由 575 ms 降至 542 ms，五次采样中的最大峰值工作集由 72.2 MiB 降至 65.1 MiB。
+
 ## 比较两版地形
 
 ```sh
@@ -92,5 +96,3 @@ moon run cmd/main -- rewrite examples/terrain.xml --timestamp 2026-11-21 09:00:0
 ```
 
 回写结果包含 MoonTIN 支持的 TIN 曲面、点、面和线性单位。默认保留测点 ID、三角面方向及可见性。`--visible-only` 移除隐藏面及其独用测点，`--renumber-points` 将每个曲面的测点重新编号为连续整数。`--timestamp DATE TIME` 和 `--project NAME` 可为交付文件补充元数据。回写的范围限于 TIN 数据，原文件的坐标参考系统、断裂线、路线及其他扩展元数据不会进入输出。往返测试验证 MoonTIN 可重读输出。
-
-在单曲面样本中加入 90,000 个无关 `CgPoint` 元素后，文件大小约 3.77 MB。Windows Release 交替运行五次，优化前后 JSON 报告逐字节一致。中位耗时由 509 ms 降至 465 ms，采样峰值工作集由 78.1 MiB 降至 33.9 MiB。上述数据适用于该合成输入和本地环境。

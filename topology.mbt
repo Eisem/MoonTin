@@ -83,37 +83,56 @@ fn SurfaceTopology::check_edges(
 
 ///|
 fn SurfaceTopology::summarize(self : SurfaceTopology) -> (Int, Int) {
-  let neighbors : Map[Int, Array[Int]] = Map([])
-  self.faces.each(fn(_, number) { neighbors[number] = [] })
+  let mut highest_face = 0
+  self.faces.each(fn(_, number) { highest_face = highest_face.max(number) })
+  // A negative entry identifies a root and stores the negated set size.
+  let parents = FixedArray::make(highest_face + 1, -1)
   let mut boundary = 0
+  let mut components = self.faces.length()
   self.edges.each(fn(_, uses) {
     if uses.length() == 1 {
       boundary += 1
     } else {
-      let first = uses[0].face_number
+      let mut first = component_root(parents, uses[0].face_number)
       for index = 1; index < uses.length(); index = index + 1 {
-        let next = uses[index].face_number
-        neighbors[first].push(next)
-        neighbors[next].push(first)
-      }
-    }
-  })
-  let visited : Map[Int, Bool] = Map([])
-  let mut components = 0
-  neighbors.each(fn(start, _) {
-    if !visited.contains(start) {
-      components += 1
-      let pending = [start]
-      visited[start] = true
-      while pending.pop() is Some(face) {
-        for next in neighbors[face] {
-          if !visited.contains(next) {
-            visited[next] = true
-            pending.push(next)
-          }
+        let other = component_root(parents, uses[index].face_number)
+        if first != other {
+          first = merge_components(parents, first, other)
+          components -= 1
         }
       }
     }
   })
   (boundary, components)
+}
+
+///|
+fn component_root(parents : FixedArray[Int], face : Int) -> Int {
+  let mut root = face
+  while parents[root] >= 0 {
+    root = parents[root]
+  }
+  let mut child = face
+  while child != root {
+    let parent = parents[child]
+    parents[child] = root
+    child = parent
+  }
+  root
+}
+
+///|
+fn merge_components(
+  parents : FixedArray[Int],
+  first : Int,
+  second : Int,
+) -> Int {
+  let (large, small) = if parents[first] <= parents[second] {
+    (first, second)
+  } else {
+    (second, first)
+  }
+  parents[large] += parents[small]
+  parents[small] = large
+  large
 }
