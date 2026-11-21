@@ -109,7 +109,13 @@ try {
     $badSurvey = Invoke-MoonTin @('survey', 'examples/terrain.xml', 'examples/terrain.xml', '0.1') 2
     Assert-Equal ($badSurvey.Stderr -match 'invalid survey points JSON') $true 'Malformed survey file'
 
-    Write-Output 'MoonTIN CLI integration checks passed (18 cases).'
+    $contour = Invoke-MoonTin @('contour', 'examples/terrain.xml', '10.5', '--level', '99', '--format', 'json') 0
+    $contourReport = $contour.Stdout | ConvertFrom-Json
+    Assert-Equal $contourReport.paths.Count 1 'Contour path count'
+    Assert-Equal $contourReport.paths[0].elevation 10.5 'Contour elevation'
+    Assert-Equal $contourReport.paths[0].points.Count 2 'Contour endpoint count'
+
+    Write-Output 'MoonTIN CLI integration checks passed (19 cases).'
 } finally {
     Remove-Item -LiteralPath $stderrPath, $emptyPath
     Pop-Location

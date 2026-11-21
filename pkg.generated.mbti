@@ -12,6 +12,8 @@ pub fn compare_terrain(Terrain, Terrain, coordinate_tolerance? : Double, max_det
 
 pub fn elevation_profile(Terrain, (Double, Double), (Double, Double), surface_name? : String) -> ElevationProfile raise SamplingError
 
+pub fn extract_contours(Terrain, ArrayView[Double], surface_name? : String, max_segments? : Int) -> ContourReport raise SamplingError
+
 pub fn parse(String) -> Terrain raise
 
 pub fn parse_records(String) -> ParsedTerrain raise
@@ -57,6 +59,29 @@ pub struct CheckReport {
 }
 pub fn CheckReport::passed(Self) -> Bool
 pub fn CheckReport::to_json(Self) -> Json
+
+pub struct ContourPath {
+  surface_number : Int
+  surface_name : String
+  elevation : Double
+  closed : Bool
+  points : Array[ContourPoint]
+}
+pub fn ContourPath::to_json(Self) -> Json
+
+pub struct ContourPoint {
+  northing : Double
+  easting : Double
+}
+pub fn ContourPoint::to_json(Self) -> Json
+
+pub struct ContourReport {
+  linear_unit : String?
+  levels : Array[Double]
+  paths : Array[ContourPath]
+  skipped_flat_faces : Int
+}
+pub fn ContourReport::to_json(Self) -> Json
 
 pub(all) struct Diagnostic {
   rule : Rule

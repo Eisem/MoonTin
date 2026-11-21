@@ -250,3 +250,20 @@ test "survey rejects a control point if any overlapping face is outside toleranc
     @moontin.check_survey_points(terrain, points[:], 0.5, surface_name="Lower").passed(),
   )
 }
+
+///|
+test "contour joins adjacent triangles across their shared edge" {
+  let xml =
+    #|<LandXML xmlns="http://www.landxml.org/schema/LandXML-1.2" version="1.2">
+    #|<Surfaces><Surface name="Ramp"><Definition surfType="TIN">
+    #|<Pnts><P id="a">0 0 0</P><P id="b">0 1 1</P><P id="c">1 0 0</P><P id="d">1 1 1</P></Pnts>
+    #|<Faces><F>a b c</F><F>c b d</F></Faces>
+    #|</Definition></Surface></Surfaces></LandXML>
+  let report = @moontin.extract_contours(@moontin.parse(xml), [0.5])
+  assert_eq(report.paths.length(), 1)
+  let path = report.paths[0]
+  assert_false(path.closed)
+  assert_eq(path.points.length(), 3)
+  assert_eq(path.points[1].northing, 0.5)
+  assert_true(path.points.all(fn(point) { point.easting == 0.5 }))
+}

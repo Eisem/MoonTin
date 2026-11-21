@@ -68,3 +68,11 @@ moon run cmd/main -- survey examples/terrain.xml examples/survey-points.json 0.1
 ```
 
 测点文件是 JSON 数组，每项包含字符串 `id` 和数值 `northing`、`easting`、`elevation`。容差沿用地形线性单位。若多个可见面覆盖同一测点，所有插值高程都须落在容差内。报告按输入顺序记录每个点的覆盖数、插值范围和偏差最大的面。退出码 `0` 表示全部通过，`1` 表示存在超差或无覆盖测点，`2` 表示输入错误。
+
+## 提取等高线
+
+```sh
+moon run cmd/main -- contour examples/terrain.xml 10.5 --level 11.5 --format json
+```
+
+每条线沿相邻可见三角面的共享边拼接。分叉点处会拆成独立路径。整面高程与等高线重合时计入 `skipped_flat_faces`，单点接触不会形成路径。退出码 `1` 表示没有线段，`2` 表示输入或计算错误。
