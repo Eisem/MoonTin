@@ -76,3 +76,11 @@ moon run cmd/main -- contour examples/terrain.xml 10.5 --level 11.5 --format jso
 ```
 
 每条线沿相邻可见三角面的共享边拼接。分叉点处会拆成独立路径。整面高程与等高线重合时计入 `skipped_flat_faces`，单点接触不会形成路径。退出码 `1` 表示没有线段，`2` 表示输入或计算错误。
+
+## 计算相对基准面的挖填方量
+
+```sh
+moon run cmd/main -- volume examples/terrain.xml 11 --format json
+```
+
+默认使用指定高程的水平面。`--anchor NORTH EAST` 设置锚点，`--grade NORTH EAST` 设置两个方向的单位坡降系数，即每单位水平距离对应的高程变化。工具切分跨过基准面的可见三角面，对上下两侧分别积分，报告挖方、填方、净挖方和投影面积。方量为文件线性单位的立方。重叠曲面分别计量。

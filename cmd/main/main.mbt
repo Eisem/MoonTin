@@ -155,6 +155,8 @@ fn parse_options(args : ArrayView[String]) -> CheckOptions raise {
 async fn main {
   let status = try {
     match @env.args() {
+      [_, "volume", path, height, .. options] =>
+        volume_file(path, parse_volume_options(height, options))
       [_, "contour", path, level, .. options] =>
         contour_file(path, parse_contour_options(level, options))
       [_, "survey", terrain, points, tolerance, .. options] =>
@@ -187,6 +189,9 @@ async fn main {
       _ => {
         eprintln(
           "Usage: moontin check <terrain.xml> [--format text|json] [--area-tolerance N] [--strict] [--max-diagnostics N] [--max-input-bytes N] [--max-records N]",
+        )
+        eprintln(
+          "       moontin volume <terrain.xml> <elevation> [--anchor NORTH EAST] [--grade NORTH EAST] [--surface NAME] [--format text|json]",
         )
         eprintln(
           "       moontin contour <terrain.xml> <level> [--level N] [--surface NAME] [--format text|json]",

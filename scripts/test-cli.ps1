@@ -115,7 +115,16 @@ try {
     Assert-Equal $contourReport.paths[0].elevation 10.5 'Contour elevation'
     Assert-Equal $contourReport.paths[0].points.Count 2 'Contour endpoint count'
 
-    Write-Output 'MoonTIN CLI integration checks passed (19 cases).'
+    $volume = Invoke-MoonTin @('volume', 'examples/terrain.xml', '11', '--format', 'json') 0
+    $volumeReport = $volume.Stdout | ConvertFrom-Json
+    Assert-Equal $volumeReport.surfaces[0].crossing_faces 1 'Volume crossing triangle'
+    Assert-Equal ([Math]::Round($volumeReport.cut, 10)) ([Math]::Round(1.0 / 12.0, 10)) 'Integrated cut'
+    Assert-Equal $volumeReport.fill $volumeReport.cut 'Symmetric fill'
+
+    $plane = Invoke-MoonTin @('volume', 'examples/terrain.xml', '10', '--anchor', '100', '200', '--grade', '2', '1', '--format', 'json') 0
+    Assert-Equal ($plane.Stdout | ConvertFrom-Json).surfaces[0].coincident_faces 1 'Sloped reference coincident face'
+
+    Write-Output 'MoonTIN CLI integration checks passed (21 cases).'
 } finally {
     Remove-Item -LiteralPath $stderrPath, $emptyPath
     Pop-Location

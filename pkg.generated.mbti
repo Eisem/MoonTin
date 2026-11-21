@@ -12,6 +12,8 @@ pub fn compare_terrain(Terrain, Terrain, coordinate_tolerance? : Double, max_det
 
 pub fn elevation_profile(Terrain, (Double, Double), (Double, Double), surface_name? : String) -> ElevationProfile raise SamplingError
 
+pub fn estimate_volume(Terrain, ReferencePlane, surface_name? : String) -> VolumeReport raise SamplingError
+
 pub fn extract_contours(Terrain, ArrayView[Double], surface_name? : String, max_segments? : Int) -> ContourReport raise SamplingError
 
 pub fn parse(String) -> Terrain raise
@@ -215,6 +217,15 @@ pub(all) struct RecordIssue {
 }
 pub fn RecordIssue::to_json(Self) -> Json
 
+pub(all) struct ReferencePlane {
+  northing : Double
+  easting : Double
+  elevation : Double
+  north_grade : Double
+  east_grade : Double
+}
+pub fn ReferencePlane::to_json(Self) -> Json
+
 pub(all) enum Rule {
   DuplicatePoint
   MissingPoint
@@ -341,6 +352,31 @@ pub struct TerrainMesh {
   origin : MeshVertex
 }
 pub fn TerrainMesh::encode(Self, MeshFormat) -> String
+
+pub struct VolumeReport {
+  reference : ReferencePlane
+  linear_unit : String?
+  surfaces : Array[VolumeSurface]
+  cut : Double
+  fill : Double
+}
+pub fn VolumeReport::to_json(Self) -> Json
+
+pub struct VolumeSurface {
+  number : Int
+  name : String
+  faces : Int
+  above_faces : Int
+  below_faces : Int
+  crossing_faces : Int
+  coincident_faces : Int
+  projected_area : Double
+  above_area : Double
+  below_area : Double
+  cut : Double
+  fill : Double
+}
+pub fn VolumeSurface::to_json(Self) -> Json
 
 // Type aliases
 
