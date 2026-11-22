@@ -1,0 +1,33 @@
+name: MoonTIN CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  native:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install MoonBit
+        shell: bash
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
+      - name: Check source
+        run: |
+          moon version
+          moon check --target native
+      - name: Run native tests
+        run: moon test --target native
+      - name: Verify CLI workflows
+        shell: pwsh
+        run: ./scripts/test-cli.ps1
+      - name: Build Mooncakes archive
+        run: moon package
