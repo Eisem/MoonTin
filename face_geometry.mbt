@@ -108,7 +108,7 @@ fn GeometryAccumulator::summarize(self : GeometryAccumulator) -> FaceGeometry {
 ///|
 fn metric_json(value : Double?) -> Json {
   match value {
-    Some(number) => number.to_json()
+    Some(number) => ToJson::to_json(number)
     None => Json::null()
   }
 }
@@ -120,7 +120,7 @@ pub fn FaceGeometry::to_json(self : FaceGeometry) -> Json {
     "surface_area": metric_json(self.surface_area),
     "min_grade_percent": metric_json(self.min_grade_percent),
     "max_grade_percent": metric_json(self.max_grade_percent),
-    "measured_faces": self.measured_faces.to_json(),
-    "overflow_faces": self.overflow_faces.to_json(),
+    "measured_faces": ToJson::to_json(self.measured_faces),
+    "overflow_faces": ToJson::to_json(self.overflow_faces),
   }
 }

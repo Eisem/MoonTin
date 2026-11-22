@@ -323,16 +323,16 @@ pub fn TerrainComparison::changed(self : TerrainComparison) -> Bool {
 ///|
 fn coordinates_json(point : Point) -> Json {
   {
-    "northing": point.northing.to_json(),
-    "easting": point.easting.to_json(),
-    "elevation": point.elevation.to_json(),
+    "northing": ToJson::to_json(point.northing),
+    "easting": ToJson::to_json(point.easting),
+    "elevation": ToJson::to_json(point.elevation),
   }
 }
 
 ///|
 pub fn PointChange::to_json(self : PointChange) -> Json {
   {
-    "id": self.id.to_json(),
+    "id": ToJson::to_json(self.id),
     "before": coordinates_json(self.before),
     "after": coordinates_json(self.after),
   }
@@ -341,36 +341,36 @@ pub fn PointChange::to_json(self : PointChange) -> Json {
 ///|
 pub fn FaceChange::to_json(self : FaceChange) -> Json {
   {
-    "vertices": self.vertices.to_json(),
-    "before_number": self.before_number.to_json(),
-    "after_number": self.after_number.to_json(),
-    "winding_changed": self.winding_changed.to_json(),
-    "visibility_changed": self.visibility_changed.to_json(),
+    "vertices": ToJson::to_json(self.vertices),
+    "before_number": ToJson::to_json(self.before_number),
+    "after_number": ToJson::to_json(self.after_number),
+    "winding_changed": ToJson::to_json(self.winding_changed),
+    "visibility_changed": ToJson::to_json(self.visibility_changed),
   }
 }
 
 ///|
 pub fn SurfaceComparison::to_json(self : SurfaceComparison) -> Json {
   {
-    "name": self.name.to_json(),
-    "status": self.status.to_json(),
-    "added_point_count": self.added_point_count.to_json(),
-    "removed_point_count": self.removed_point_count.to_json(),
-    "moved_point_count": self.moved_point_count.to_json(),
-    "added_face_count": self.added_face_count.to_json(),
-    "removed_face_count": self.removed_face_count.to_json(),
-    "changed_face_count": self.changed_face_count.to_json(),
-    "added_points": self.added_points.to_json(),
-    "removed_points": self.removed_points.to_json(),
-    "moved_points": self.moved_points
-    .map(fn(point) { point.to_json() })
-    .to_json(),
-    "added_faces": self.added_faces.to_json(),
-    "removed_faces": self.removed_faces.to_json(),
-    "changed_faces": self.changed_faces
-    .map(fn(face) { face.to_json() })
-    .to_json(),
-    "truncated": self.truncated.to_json(),
+    "name": ToJson::to_json(self.name),
+    "status": ToJson::to_json(self.status),
+    "added_point_count": ToJson::to_json(self.added_point_count),
+    "removed_point_count": ToJson::to_json(self.removed_point_count),
+    "moved_point_count": ToJson::to_json(self.moved_point_count),
+    "added_face_count": ToJson::to_json(self.added_face_count),
+    "removed_face_count": ToJson::to_json(self.removed_face_count),
+    "changed_face_count": ToJson::to_json(self.changed_face_count),
+    "added_points": ToJson::to_json(self.added_points),
+    "removed_points": ToJson::to_json(self.removed_points),
+    "moved_points": ToJson::to_json(
+      self.moved_points.map(fn(point) { point.to_json() }),
+    ),
+    "added_faces": ToJson::to_json(self.added_faces),
+    "removed_faces": ToJson::to_json(self.removed_faces),
+    "changed_faces": ToJson::to_json(
+      self.changed_faces.map(fn(face) { face.to_json() }),
+    ),
+    "truncated": ToJson::to_json(self.truncated),
   }
 }
 
@@ -378,12 +378,14 @@ pub fn SurfaceComparison::to_json(self : SurfaceComparison) -> Json {
 pub fn TerrainComparison::to_json(self : TerrainComparison) -> Json {
   {
     "schema_version": 1,
-    "changed": self.changed().to_json(),
+    "changed": ToJson::to_json(self.changed()),
     "linear_unit": match self.linear_unit {
-      Some(unit) => unit.to_json()
+      Some(unit) => ToJson::to_json(unit)
       None => Json::null()
     },
-    "coordinate_tolerance": self.coordinate_tolerance.to_json(),
-    "surfaces": self.surfaces.map(fn(surface) { surface.to_json() }).to_json(),
+    "coordinate_tolerance": ToJson::to_json(self.coordinate_tolerance),
+    "surfaces": ToJson::to_json(
+      self.surfaces.map(fn(surface) { surface.to_json() }),
+    ),
   }
 }

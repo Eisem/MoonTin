@@ -18,18 +18,18 @@ pub fn Rule::code(self : Rule) -> String {
 ///|
 pub fn Diagnostic::to_json(self : Diagnostic) -> Json {
   {
-    "code": self.rule.code().to_json(),
-    "severity": "error".to_json(),
-    "surface_number": self.surface_number.to_json(),
-    "surface_name": self.surface_name.to_json(),
+    "code": ToJson::to_json(self.rule.code()),
+    "severity": ToJson::to_json("error"),
+    "surface_number": ToJson::to_json(self.surface_number),
+    "surface_name": ToJson::to_json(self.surface_name),
     "face_number": match self.face_number {
-      Some(number) => number.to_json()
+      Some(number) => ToJson::to_json(number)
       None => Json::null()
     },
-    "point_ids": self.point_ids.to_json(),
-    "related_faces": self.related_faces
-    .map(fn(face) { face.to_json() })
-    .to_json(),
+    "point_ids": ToJson::to_json(self.point_ids),
+    "related_faces": ToJson::to_json(
+      self.related_faces.map(fn(face) { face.to_json() }),
+    ),
     "location": match self.location {
       Some(location) => location.to_json()
       None => Json::null()
@@ -45,7 +45,7 @@ pub struct SourceLocation {
 
 ///|
 pub fn SourceLocation::to_json(self : SourceLocation) -> Json {
-  { "line": self.line.to_json(), "column": self.column.to_json() }
+  { "line": ToJson::to_json(self.line), "column": ToJson::to_json(self.column) }
 }
 
 ///|
@@ -63,7 +63,7 @@ pub struct FaceReference {
 ///|
 pub fn FaceReference::to_json(self : FaceReference) -> Json {
   {
-    "number": self.number.to_json(),
+    "number": ToJson::to_json(self.number),
     "location": match self.location {
       Some(location) => location.to_json()
       None => Json::null()

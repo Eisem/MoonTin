@@ -308,30 +308,30 @@ pub fn estimate_volume(
 ///|
 pub fn ReferencePlane::to_json(self : ReferencePlane) -> Json {
   {
-    "northing": self.northing.to_json(),
-    "easting": self.easting.to_json(),
-    "elevation": self.elevation.to_json(),
-    "north_grade": self.north_grade.to_json(),
-    "east_grade": self.east_grade.to_json(),
+    "northing": ToJson::to_json(self.northing),
+    "easting": ToJson::to_json(self.easting),
+    "elevation": ToJson::to_json(self.elevation),
+    "north_grade": ToJson::to_json(self.north_grade),
+    "east_grade": ToJson::to_json(self.east_grade),
   }
 }
 
 ///|
 pub fn VolumeSurface::to_json(self : VolumeSurface) -> Json {
   {
-    "surface_number": self.number.to_json(),
-    "surface_name": self.name.to_json(),
-    "faces": self.faces.to_json(),
-    "above_faces": self.above_faces.to_json(),
-    "below_faces": self.below_faces.to_json(),
-    "crossing_faces": self.crossing_faces.to_json(),
-    "coincident_faces": self.coincident_faces.to_json(),
-    "projected_area": self.projected_area.to_json(),
-    "above_area": self.above_area.to_json(),
-    "below_area": self.below_area.to_json(),
-    "cut": self.cut.to_json(),
-    "fill": self.fill.to_json(),
-    "net_cut": (self.cut - self.fill).to_json(),
+    "surface_number": ToJson::to_json(self.number),
+    "surface_name": ToJson::to_json(self.name),
+    "faces": ToJson::to_json(self.faces),
+    "above_faces": ToJson::to_json(self.above_faces),
+    "below_faces": ToJson::to_json(self.below_faces),
+    "crossing_faces": ToJson::to_json(self.crossing_faces),
+    "coincident_faces": ToJson::to_json(self.coincident_faces),
+    "projected_area": ToJson::to_json(self.projected_area),
+    "above_area": ToJson::to_json(self.above_area),
+    "below_area": ToJson::to_json(self.below_area),
+    "cut": ToJson::to_json(self.cut),
+    "fill": ToJson::to_json(self.fill),
+    "net_cut": ToJson::to_json(self.cut - self.fill),
   }
 }
 
@@ -341,12 +341,14 @@ pub fn VolumeReport::to_json(self : VolumeReport) -> Json {
     "schema_version": 1,
     "reference": self.reference.to_json(),
     "linear_unit": match self.linear_unit {
-      Some(unit) => unit.to_json()
+      Some(unit) => ToJson::to_json(unit)
       None => Json::null()
     },
-    "cut": self.cut.to_json(),
-    "fill": self.fill.to_json(),
-    "net_cut": (self.cut - self.fill).to_json(),
-    "surfaces": self.surfaces.map(fn(surface) { surface.to_json() }).to_json(),
+    "cut": ToJson::to_json(self.cut),
+    "fill": ToJson::to_json(self.fill),
+    "net_cut": ToJson::to_json(self.cut - self.fill),
+    "surfaces": ToJson::to_json(
+      self.surfaces.map(fn(surface) { surface.to_json() }),
+    ),
   }
 }

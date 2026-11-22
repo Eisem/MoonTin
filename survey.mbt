@@ -289,12 +289,12 @@ pub fn SurveyReport::passed(self : SurveyReport) -> Bool {
 ///|
 pub fn SurveyResult::to_json(self : SurveyResult) -> Json {
   {
-    "id": self.point.id.to_json(),
-    "northing": self.point.northing.to_json(),
-    "easting": self.point.easting.to_json(),
-    "measured_elevation": self.point.elevation.to_json(),
-    "status": self.status.label().to_json(),
-    "hit_count": self.hit_count.to_json(),
+    "id": ToJson::to_json(self.point.id),
+    "northing": ToJson::to_json(self.point.northing),
+    "easting": ToJson::to_json(self.point.easting),
+    "measured_elevation": ToJson::to_json(self.point.elevation),
+    "status": ToJson::to_json(self.status.label()),
+    "hit_count": ToJson::to_json(self.hit_count),
     "min_elevation": metric_json(self.min_elevation),
     "max_elevation": metric_json(self.max_elevation),
     "max_absolute_error": metric_json(self.max_absolute_error),
@@ -309,15 +309,17 @@ pub fn SurveyResult::to_json(self : SurveyResult) -> Json {
 pub fn SurveyReport::to_json(self : SurveyReport) -> Json {
   {
     "schema_version": 1,
-    "passed": self.passed().to_json(),
+    "passed": ToJson::to_json(self.passed()),
     "linear_unit": match self.linear_unit {
-      Some(unit) => unit.to_json()
+      Some(unit) => ToJson::to_json(unit)
       None => Json::null()
     },
-    "tolerance": self.tolerance.to_json(),
-    "passed_count": self.passed_count.to_json(),
-    "outside_tolerance_count": self.outside_tolerance_count.to_json(),
-    "uncovered_count": self.uncovered_count.to_json(),
-    "results": self.results.map(fn(result) { result.to_json() }).to_json(),
+    "tolerance": ToJson::to_json(self.tolerance),
+    "passed_count": ToJson::to_json(self.passed_count),
+    "outside_tolerance_count": ToJson::to_json(self.outside_tolerance_count),
+    "uncovered_count": ToJson::to_json(self.uncovered_count),
+    "results": ToJson::to_json(
+      self.results.map(fn(result) { result.to_json() }),
+    ),
   }
 }

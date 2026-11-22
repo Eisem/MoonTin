@@ -217,21 +217,21 @@ pub fn elevation_profile(
 ///|
 pub fn ProfileSegment::to_json(self : ProfileSegment) -> Json {
   {
-    "surface_number": self.surface_number.to_json(),
-    "surface_name": self.surface_name.to_json(),
-    "face_number": self.face_number.to_json(),
-    "start_distance": self.start_distance.to_json(),
-    "end_distance": self.end_distance.to_json(),
-    "start_elevation": self.start_elevation.to_json(),
-    "end_elevation": self.end_elevation.to_json(),
+    "surface_number": ToJson::to_json(self.surface_number),
+    "surface_name": ToJson::to_json(self.surface_name),
+    "face_number": ToJson::to_json(self.face_number),
+    "start_distance": ToJson::to_json(self.start_distance),
+    "end_distance": ToJson::to_json(self.end_distance),
+    "start_elevation": ToJson::to_json(self.start_elevation),
+    "end_elevation": ToJson::to_json(self.end_elevation),
   }
 }
 
 ///|
 pub fn ProfileRange::to_json(self : ProfileRange) -> Json {
   {
-    "start_distance": self.start_distance.to_json(),
-    "end_distance": self.end_distance.to_json(),
+    "start_distance": ToJson::to_json(self.start_distance),
+    "end_distance": ToJson::to_json(self.end_distance),
   }
 }
 
@@ -239,12 +239,14 @@ pub fn ProfileRange::to_json(self : ProfileRange) -> Json {
 pub fn ElevationProfile::to_json(self : ElevationProfile) -> Json {
   {
     "schema_version": 1,
-    "length": self.length.to_json(),
+    "length": ToJson::to_json(self.length),
     "linear_unit": match self.linear_unit {
-      Some(unit) => unit.to_json()
+      Some(unit) => ToJson::to_json(unit)
       None => Json::null()
     },
-    "segments": self.segments.map(fn(segment) { segment.to_json() }).to_json(),
-    "gaps": self.gaps.map(fn(gap) { gap.to_json() }).to_json(),
+    "segments": ToJson::to_json(
+      self.segments.map(fn(segment) { segment.to_json() }),
+    ),
+    "gaps": ToJson::to_json(self.gaps.map(fn(gap) { gap.to_json() })),
   }
 }

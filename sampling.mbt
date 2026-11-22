@@ -164,11 +164,11 @@ fn each_visible_triangle(
 ///|
 pub fn ElevationHit::to_json(self : ElevationHit) -> Json {
   {
-    "surface_number": self.surface_number.to_json(),
-    "surface_name": self.surface_name.to_json(),
-    "face_number": self.face_number.to_json(),
-    "elevation": self.elevation.to_json(),
-    "point_ids": self.point_ids.to_json(),
+    "surface_number": ToJson::to_json(self.surface_number),
+    "surface_name": ToJson::to_json(self.surface_name),
+    "face_number": ToJson::to_json(self.face_number),
+    "elevation": ToJson::to_json(self.elevation),
+    "point_ids": ToJson::to_json(self.point_ids),
   }
 }
 
@@ -176,12 +176,12 @@ pub fn ElevationHit::to_json(self : ElevationHit) -> Json {
 pub fn ElevationSample::to_json(self : ElevationSample) -> Json {
   {
     "schema_version": 1,
-    "northing": self.northing.to_json(),
-    "easting": self.easting.to_json(),
+    "northing": ToJson::to_json(self.northing),
+    "easting": ToJson::to_json(self.easting),
     "linear_unit": match self.linear_unit {
-      Some(unit) => unit.to_json()
+      Some(unit) => ToJson::to_json(unit)
       None => Json::null()
     },
-    "hits": self.hits.map(fn(hit) { hit.to_json() }).to_json(),
+    "hits": ToJson::to_json(self.hits.map(fn(hit) { hit.to_json() })),
   }
 }

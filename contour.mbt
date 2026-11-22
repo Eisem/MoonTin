@@ -322,17 +322,20 @@ pub fn extract_contours(
 
 ///|
 pub fn ContourPoint::to_json(self : ContourPoint) -> Json {
-  { "northing": self.northing.to_json(), "easting": self.easting.to_json() }
+  {
+    "northing": ToJson::to_json(self.northing),
+    "easting": ToJson::to_json(self.easting),
+  }
 }
 
 ///|
 pub fn ContourPath::to_json(self : ContourPath) -> Json {
   {
-    "surface_number": self.surface_number.to_json(),
-    "surface_name": self.surface_name.to_json(),
-    "elevation": self.elevation.to_json(),
-    "closed": self.closed.to_json(),
-    "points": self.points.map(fn(point) { point.to_json() }).to_json(),
+    "surface_number": ToJson::to_json(self.surface_number),
+    "surface_name": ToJson::to_json(self.surface_name),
+    "elevation": ToJson::to_json(self.elevation),
+    "closed": ToJson::to_json(self.closed),
+    "points": ToJson::to_json(self.points.map(fn(point) { point.to_json() })),
   }
 }
 
@@ -341,11 +344,11 @@ pub fn ContourReport::to_json(self : ContourReport) -> Json {
   {
     "schema_version": 1,
     "linear_unit": match self.linear_unit {
-      Some(unit) => unit.to_json()
+      Some(unit) => ToJson::to_json(unit)
       None => Json::null()
     },
-    "levels": self.levels.to_json(),
-    "paths": self.paths.map(fn(path) { path.to_json() }).to_json(),
-    "skipped_flat_faces": self.skipped_flat_faces.to_json(),
+    "levels": ToJson::to_json(self.levels),
+    "paths": ToJson::to_json(self.paths.map(fn(path) { path.to_json() })),
+    "skipped_flat_faces": ToJson::to_json(self.skipped_flat_faces),
   }
 }

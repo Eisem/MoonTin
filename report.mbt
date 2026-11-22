@@ -6,7 +6,19 @@ pub struct Bounds {
   max_easting : Double
   min_elevation : Double
   max_elevation : Double
-} derive(ToJson)
+}
+
+///|
+pub impl ToJson for Bounds with fn to_json(self) {
+  {
+    "min_northing": ToJson::to_json(self.min_northing),
+    "max_northing": ToJson::to_json(self.max_northing),
+    "min_easting": ToJson::to_json(self.min_easting),
+    "max_easting": ToJson::to_json(self.max_easting),
+    "min_elevation": ToJson::to_json(self.min_elevation),
+    "max_elevation": ToJson::to_json(self.max_elevation),
+  }
+}
 
 ///|
 pub extend Bounds with ToJson::{to_json}
@@ -91,21 +103,21 @@ fn summarize_surface(
 ///|
 pub fn SurfaceSummary::to_json(self : SurfaceSummary) -> Json {
   {
-    "surface_number": self.surface_number.to_json(),
-    "name": self.name.to_json(),
-    "decoded_points": self.decoded_points.to_json(),
-    "decoded_faces": self.decoded_faces.to_json(),
-    "invisible_faces": self.invisible_faces.to_json(),
-    "indexed_faces": self.indexed_faces.to_json(),
-    "skipped_visible_faces": self.skipped_visible_faces.to_json(),
-    "usable_points": self.usable_points.to_json(),
-    "boundary_edges": self.boundary_edges.to_json(),
-    "boundary_loops": self.boundary_loops.to_json(),
-    "branched_boundaries": self.branched_boundaries.to_json(),
-    "connected_components": self.connected_components.to_json(),
+    "surface_number": ToJson::to_json(self.surface_number),
+    "name": ToJson::to_json(self.name),
+    "decoded_points": ToJson::to_json(self.decoded_points),
+    "decoded_faces": ToJson::to_json(self.decoded_faces),
+    "invisible_faces": ToJson::to_json(self.invisible_faces),
+    "indexed_faces": ToJson::to_json(self.indexed_faces),
+    "skipped_visible_faces": ToJson::to_json(self.skipped_visible_faces),
+    "usable_points": ToJson::to_json(self.usable_points),
+    "boundary_edges": ToJson::to_json(self.boundary_edges),
+    "boundary_loops": ToJson::to_json(self.boundary_loops),
+    "branched_boundaries": ToJson::to_json(self.branched_boundaries),
+    "connected_components": ToJson::to_json(self.connected_components),
     "geometry": self.geometry.to_json(),
     "bounds": match self.bounds {
-      Some(bounds) => bounds.to_json()
+      Some(bounds) => ToJson::to_json(bounds)
       None => Json::null()
     },
   }
@@ -212,13 +224,13 @@ pub fn Severity::label(self : Severity) -> String {
 ///|
 pub fn RecordIssue::to_json(self : RecordIssue) -> Json {
   {
-    "surface_number": self.surface_number.to_json(),
-    "surface_name": self.surface_name.to_json(),
-    "code": self.code.to_json(),
-    "record_kind": self.record_kind.to_json(),
-    "record_number": self.record_number.to_json(),
-    "message": self.message.to_json(),
-    "severity": self.severity.label().to_json(),
+    "surface_number": ToJson::to_json(self.surface_number),
+    "surface_name": ToJson::to_json(self.surface_name),
+    "code": ToJson::to_json(self.code),
+    "record_kind": ToJson::to_json(self.record_kind),
+    "record_number": ToJson::to_json(self.record_number),
+    "message": ToJson::to_json(self.message),
+    "severity": ToJson::to_json(self.severity.label()),
     "location": self.location.to_json(),
   }
 }
@@ -227,21 +239,23 @@ pub fn RecordIssue::to_json(self : RecordIssue) -> Json {
 pub fn CheckReport::to_json(self : CheckReport) -> Json {
   {
     "schema_version": 1,
-    "status": (if self.passed() { "passed" } else { "failed" }).to_json(),
+    "status": ToJson::to_json(if self.passed() { "passed" } else { "failed" }),
     "linear_unit": match self.linear_unit {
-      Some(unit) => unit.to_json()
+      Some(unit) => ToJson::to_json(unit)
       None => Json::null()
     },
-    "area_tolerance": self.area_tolerance.to_json(),
-    "strict": self.strict.to_json(),
-    "error_count": self.error_count.to_json(),
-    "warning_count": self.warning_count.to_json(),
-    "truncated": self.truncated.to_json(),
-    "surface_count": self.surfaces.length().to_json(),
-    "surfaces": self.surfaces.map(fn(item) { item.to_json() }).to_json(),
-    "record_issues": self.record_issues
-    .map(fn(item) { item.to_json() })
-    .to_json(),
-    "diagnostics": self.diagnostics.map(fn(item) { item.to_json() }).to_json(),
+    "area_tolerance": ToJson::to_json(self.area_tolerance),
+    "strict": ToJson::to_json(self.strict),
+    "error_count": ToJson::to_json(self.error_count),
+    "warning_count": ToJson::to_json(self.warning_count),
+    "truncated": ToJson::to_json(self.truncated),
+    "surface_count": ToJson::to_json(self.surfaces.length()),
+    "surfaces": ToJson::to_json(self.surfaces.map(fn(item) { item.to_json() })),
+    "record_issues": ToJson::to_json(
+      self.record_issues.map(fn(item) { item.to_json() }),
+    ),
+    "diagnostics": ToJson::to_json(
+      self.diagnostics.map(fn(item) { item.to_json() }),
+    ),
   }
 }

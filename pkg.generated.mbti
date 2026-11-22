@@ -51,8 +51,9 @@ pub struct Bounds {
   max_easting : Double
   min_elevation : Double
   max_elevation : Double
-} derive(ToJson)
+}
 pub fn Bounds::to_json(Self) -> Json
+pub impl ToJson for Bounds
 
 pub struct CheckReport {
   surfaces : Array[SurfaceSummary]
