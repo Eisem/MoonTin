@@ -23,6 +23,7 @@ jobs:
       - name: Check source
         run: |
           moon version
+          moon update
           moon check --target native
       - name: Run native tests
         run: moon test --target native
