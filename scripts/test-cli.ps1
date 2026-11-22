@@ -24,8 +24,13 @@ $emptyPath = [IO.Path]::GetTempFileName()
 try {
     & moon build --target native cmd/main
     Assert-Equal $LASTEXITCODE 0 'Native build exit'
-    $binary = if ($IsWindows) { 'main.exe' } else { 'main' }
-    $cliPath = (Resolve-Path (Join-Path '_build/native/debug/build/cmd/main' $binary)).Path
+    $nativeOutput = '_build/native/debug/build/cmd/main'
+    $cliPath = @('main.exe', 'main') |
+        ForEach-Object { Join-Path $nativeOutput $_ } |
+        Where-Object { Test-Path -LiteralPath $_ -PathType Leaf } |
+        Select-Object -First 1
+    if (!$cliPath) { throw "MoonTin native executable was not built in $nativeOutput." }
+    $cliPath = (Resolve-Path -LiteralPath $cliPath).Path
 
     $valid = Invoke-MoonTin @('check', 'examples/terrain.xml', '--format', 'json') 0
     $validReport = $valid.Stdout | ConvertFrom-Json
