@@ -28,7 +28,6 @@ jobs:
       - name: Run native tests
         run: moon test --target native
       - name: Verify CLI workflows
-        shell: pwsh
-        run: ./scripts/test-cli.ps1
+        run: pwsh -NoProfile -File scripts/test-cli.ps1
       - name: Build Mooncakes archive
         run: moon package
