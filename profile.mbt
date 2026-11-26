@@ -196,6 +196,42 @@ pub fn elevation_profile(
       segments.push(segment)
     }
   })
+  finish_profile(line.length, terrain.linear_unit, segments)
+}
+
+///|
+/// Extracts a survey line profile using the previously built visible-face index.
+pub fn ElevationIndex::profile(
+  self : ElevationIndex,
+  start : (Double, Double),
+  end : (Double, Double),
+) -> ElevationProfile raise SamplingError {
+  let line = profile_line(start, end)
+  let segments = []
+  let (start_north, start_east) = start
+  let (end_north, end_east) = end
+  let region : SampleBounds = {
+    min_north: start_north.min(end_north),
+    max_north: start_north.max(end_north),
+    min_east: start_east.min(end_east),
+    max_east: start_east.max(end_east),
+  }
+  if self.root is Some(tree) {
+    tree.visit_region(region, fn(triangle) {
+      if profile_segment(triangle, line) is Some(segment) {
+        segments.push(segment)
+      }
+    })
+  }
+  finish_profile(line.length, self.linear_unit, segments)
+}
+
+///|
+fn finish_profile(
+  length : Double,
+  linear_unit : String?,
+  segments : Array[ProfileSegment],
+) -> ElevationProfile {
   segments.sort_by(fn(a, b) {
     let order = a.start_distance.compare(b.start_distance)
     if order != 0 {
@@ -206,12 +242,7 @@ pub fn elevation_profile(
       a.face_number.compare(b.face_number)
     }
   })
-  {
-    length: line.length,
-    linear_unit: terrain.linear_unit,
-    gaps: profile_gaps(segments, line.length),
-    segments,
-  }
+  { length, linear_unit, gaps: profile_gaps(segments, length), segments, }
 }
 
 ///|

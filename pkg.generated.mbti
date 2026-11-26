@@ -150,6 +150,7 @@ pub struct ElevationIndex {
   linear_unit : String?
   // private fields
 }
+pub fn ElevationIndex::profile(Self, (Double, Double), (Double, Double)) -> ElevationProfile raise SamplingError
 pub fn ElevationIndex::sample(Self, Double, Double) -> ElevationSample raise SamplingError
 pub fn ElevationIndex::sample_grid(Self, ElevationGridSpec) -> ElevationGrid raise SamplingError
 

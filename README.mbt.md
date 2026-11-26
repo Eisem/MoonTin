@@ -114,3 +114,5 @@ moon bench --target native --release --package eisem/moontin --file elevation_in
 ```
 
 在 Windows 原生 Release 构建下，用包含 19,602 个三角面的 100 × 100 合成地形测量。建立索引平均约 24.02 ms。对同一批 100 个坐标，逐点调用直接扫描接口平均约 333.43 ms，复用已建索引平均约 0.064 ms。直接扫描会在每次调用时重新建立点 ID 表，复用索引的查询时间单列，未计入建索引时间。结果取决于查询分布与包围盒重叠程度。
+
+重复提取同一地形上的多条剖面时，可复用 `ElevationIndex::profile`。它先筛选与测线外接矩形相交的三角面，再按原有算法计算高程区段与缺口。

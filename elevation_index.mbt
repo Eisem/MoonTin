@@ -177,3 +177,39 @@ pub fn ElevationIndex::sample(
   }
   { northing, easting, linear_unit: self.linear_unit, hits, }
 }
+
+///|
+fn SampleBounds::overlaps(self : SampleBounds, other : SampleBounds) -> Bool {
+  // Match the profile clipper's tolerance at a line parallel to a triangle edge.
+  let north_slack = (self.max_north - self.min_north) * 4.0e-12 +
+    self.min_north.abs().max(self.max_north.abs()) * 1.0e-15
+  let east_slack = (self.max_east - self.min_east) * 4.0e-12 +
+    self.min_east.abs().max(self.max_east.abs()) * 1.0e-15
+  self.min_north - north_slack <= other.max_north &&
+  self.max_north + north_slack >= other.min_north &&
+  self.min_east - east_slack <= other.max_east &&
+  self.max_east + east_slack >= other.min_east
+}
+
+///|
+fn SampleTree::visit_region(
+  self : SampleTree,
+  region : SampleBounds,
+  visit : (SamplingTriangle) -> Unit,
+) -> Unit {
+  match self {
+    Leaf(bounds, entries) =>
+      if bounds.overlaps(region) {
+        for entry in entries {
+          if entry.bounds.overlaps(region) {
+            visit(entry.triangle)
+          }
+        }
+      }
+    Branch(bounds, left, right) =>
+      if bounds.overlaps(region) {
+        left.visit_region(region, visit)
+        right.visit_region(region, visit)
+      }
+  }
+}

@@ -47,3 +47,25 @@ test "hierarchical elevation queries match the scan across leaves and shared edg
     2,
   )
 }
+
+///|
+test "indexed profiles match scan for reversed lines, overlaps and gaps" {
+  let terrain = bench_elevation_terrain(12)
+  let surface = terrain.surfaces[0]
+  terrain.surfaces.push({ ..surface, name: "Overlay", })
+  let index = build_elevation_index(terrain)
+  for
+    endpoints in [
+      ((0.0, -2.0), (0.0, 13.0)),
+      ((-1.0e-13, -2.0), (-1.0e-13, 13.0)),
+      ((3.25, 13.0), (3.25, -2.0)),
+      ((-1.0, -1.0), (12.0, 12.0)),
+      ((-3.0, -1.0), (-3.0, 5.0)),
+    ] {
+    let (start, end) = endpoints
+    assert_eq(
+      index.profile(start, end).to_json().stringify(),
+      elevation_profile(terrain, start, end).to_json().stringify(),
+    )
+  }
+}
