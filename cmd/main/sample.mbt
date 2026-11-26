@@ -2,12 +2,17 @@
 priv struct SampleOptions {
   surface : String?
   json : Bool
+  jsonl : Bool
 }
 
 ///|
-fn parse_sample_options(args : ArrayView[String]) -> SampleOptions raise {
+fn parse_sample_options(
+  args : ArrayView[String],
+  allow_jsonl? : Bool = false,
+) -> SampleOptions raise {
   let mut surface = None
   let mut json = false
+  let mut jsonl = false
   for rest = args {
     match rest {
       [] => break
@@ -17,16 +22,23 @@ fn parse_sample_options(args : ArrayView[String]) -> SampleOptions raise {
       }
       ["--format", "json", .. tail] => {
         json = true
+        jsonl = false
         continue tail
       }
       ["--format", "text", .. tail] => {
         json = false
+        jsonl = false
+        continue tail
+      }
+      ["--format", "jsonl", .. tail] if allow_jsonl => {
+        json = false
+        jsonl = true
         continue tail
       }
       [option, ..] => raise InvalidOption("invalid option: \{option}")
     }
   }
-  { surface, json, }
+  { surface, json, jsonl, }
 }
 
 ///|

@@ -203,7 +203,7 @@ async fn main {
           after,
           parse_grid_spec(north, east, rows, columns, north_step, east_step),
           query_coordinate("grid tolerance", tolerance),
-          parse_sample_options(options),
+          parse_sample_options(options, allow_jsonl=true),
         )
       [
         _,
@@ -249,7 +249,7 @@ async fn main {
           "       moontin profile <terrain.xml> <start-north> <start-east> <end-north> <end-east> [--surface NAME] [--format text|json]",
         )
         eprintln(
-          "       moontin grid-diff <before.xml> <after.xml> <north> <east> <rows> <columns> <north-step> <east-step> <tolerance> [--surface NAME] [--format text|json]",
+          "       moontin grid-diff <before.xml> <after.xml> <north> <east> <rows> <columns> <north-step> <east-step> <tolerance> [--surface NAME] [--format text|json|jsonl]",
         )
         eprintln(
           "       moontin grid <terrain.xml> <north> <east> <rows> <columns> <north-step> <east-step> [--surface NAME] [--format text|json]",

@@ -164,6 +164,20 @@ pub fn summarize_elevation_grid_delta(
 }
 
 ///|
+/// Visits compared nodes in row-major order without retaining the complete
+/// report. An error can occur after earlier nodes have been delivered.
+pub fn visit_elevation_grid_delta(
+  before : ElevationIndex,
+  after : ElevationIndex,
+  spec : ElevationGridSpec,
+  on_cell : (ElevationGridDeltaCell) -> Unit,
+  tolerance? : Double = 0.0,
+) -> GridChangeCounts raise SamplingError {
+  validate_grid_comparison(before, after, spec, tolerance)
+  visit_grid_changes(before, after, spec, tolerance, on_cell)
+}
+
+///|
 fn validate_grid_comparison(
   before : ElevationIndex,
   after : ElevationIndex,

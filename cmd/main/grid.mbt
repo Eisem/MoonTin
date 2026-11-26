@@ -68,7 +68,9 @@ async fn grid_diff_files(
     after,
     surface_name?=options.surface,
   )
-  let review = if options.json {
+  let review = if options.jsonl {
+    write_grid_delta_lines(before_index, after_index, spec, tolerance).needs_review()
+  } else if options.json {
     let report = @moontin.compare_elevation_grids(
       before_index,
       after_index,
@@ -97,4 +99,59 @@ async fn grid_diff_files(
   } else {
     0
   }
+}
+
+///|
+fn write_grid_delta_lines(
+  before : @moontin.ElevationIndex,
+  after : @moontin.ElevationIndex,
+  spec : @moontin.ElevationGridSpec,
+  tolerance : Double,
+) -> @moontin.GridChangeCounts raise @moontin.SamplingError {
+  let output = StringBuilder()
+  let mut buffered_lines = 0
+  let mut header_written = false
+  let write_line = fn(value : Json) {
+    if buffered_lines > 0 {
+      output.write_char('\n')
+    }
+    output.write_string(value.stringify())
+    buffered_lines += 1
+    if buffered_lines == 128 {
+      println(output.to_string())
+      output.reset()
+      buffered_lines = 0
+    }
+  }
+  let counts = @moontin.visit_elevation_grid_delta(
+    before,
+    after,
+    spec,
+    fn(cell) {
+      if !header_written {
+        write_line({
+          "type": "header",
+          "schema_version": 1,
+          "grid": spec.to_json(),
+          "linear_unit": match before.linear_unit {
+            Some(unit) => ToJson::to_json(unit)
+            None => Json::null()
+          },
+          "tolerance": ToJson::to_json(tolerance),
+        })
+        header_written = true
+      }
+      write_line({ "type": "cell", "cell": cell.to_json() })
+    },
+    tolerance~,
+  )
+  write_line({
+    "type": "summary",
+    "counts": counts.to_json(),
+    "needs_review": ToJson::to_json(counts.needs_review()),
+  })
+  if buffered_lines > 0 {
+    println(output.to_string())
+  }
+  counts
 }

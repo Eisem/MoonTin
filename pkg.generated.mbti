@@ -30,6 +30,8 @@ pub fn summarize_elevation_grid_delta(ElevationIndex, ElevationIndex, ElevationG
 
 pub fn validate(Terrain, area_tolerance? : Double) -> Array[Diagnostic]
 
+pub fn visit_elevation_grid_delta(ElevationIndex, ElevationIndex, ElevationGridSpec, (ElevationGridDeltaCell) -> Unit, tolerance? : Double) -> GridChangeCounts raise SamplingError
+
 pub fn write_landxml(Terrain, surface_name? : String, visible_only? : Bool, renumber_points? : Bool, metadata? : LandXmlMetadata) -> String raise
 
 // Errors

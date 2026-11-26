@@ -165,7 +165,27 @@ try {
     Assert-Equal ($summaryDelta.Stdout -match '1 raised, 0 lowered, 2 within tolerance, 0 ambiguous') $true 'Grid text summary counts'
     Assert-Equal ($summaryDelta.Stdout -match '0 added, 0 lost, 1 uncovered in both revisions') $true 'Grid text coverage counts'
 
-    Write-Output 'MoonTIN CLI integration checks passed (29 cases).'
+    $streamArgs = @('grid-diff', 'examples/terrain.xml', 'examples/terrain-revised.xml', '100', '200', '12', '13', '0.1', '0.1', '0.1')
+    $complete = Invoke-MoonTin ($streamArgs + @('--format', 'json')) 1
+    $streamed = Invoke-MoonTin ($streamArgs + @('--format', 'jsonl')) 1
+    $completeReport = $complete.Stdout | ConvertFrom-Json
+    $records = @($streamed.Stdout -split "\r?\n" | ForEach-Object { ConvertFrom-Json $_ })
+    Assert-Equal $records.Count 158 'JSONL records across buffer boundary'
+    Assert-Equal $records[0].type 'header' 'JSONL header'
+    Assert-Equal $records[-1].type 'summary' 'JSONL summary trailer'
+    $streamCells = @($records[1..156] | ForEach-Object {
+        Assert-Equal $_.type 'cell' 'JSONL cell record'
+        $_.cell
+    })
+    Assert-Equal (ConvertTo-Json -InputObject $streamCells -Compress -Depth 10) (ConvertTo-Json -InputObject $completeReport.cells -Compress -Depth 10) 'JSONL cells match JSON'
+    Assert-Equal (ConvertTo-Json -InputObject $records[-1].counts -Compress) (ConvertTo-Json -InputObject $completeReport.counts -Compress) 'JSONL summary matches JSON'
+    Assert-Equal $records[-1].needs_review $completeReport.needs_review 'JSONL review status'
+
+    $badStream = Invoke-MoonTin ($streamArgs[0..8] + @('-1', '--format', 'jsonl')) 2
+    Assert-Equal ([string]::IsNullOrWhiteSpace($badStream.Stdout)) $true 'Invalid JSONL stdout'
+    Assert-Equal ($badStream.Stderr -match 'tolerance must be finite and nonnegative') $true 'Invalid JSONL tolerance'
+
+    Write-Output 'MoonTIN CLI integration checks passed (32 cases).'
 } finally {
     Remove-Item -LiteralPath $stderrPath, $emptyPath
     Pop-Location
