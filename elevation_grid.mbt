@@ -56,6 +56,62 @@ fn check_grid_spec(spec : ElevationGridSpec) -> Unit raise SamplingError {
 }
 
 ///|
+fn ElevationGridSpec::visit_nodes(
+  self : ElevationGridSpec,
+  visit : (Int, Int, Double, Double) -> Unit raise SamplingError,
+) -> Unit raise SamplingError {
+  for row in 0..<self.rows {
+    let northing = self.northing + row.to_double() * self.north_step
+    for column in 0..<self.columns {
+      let easting = self.easting + column.to_double() * self.east_step
+      visit(row, column, northing, easting)
+    }
+  }
+}
+
+///|
+fn ElevationIndex::sample_grid_cell(
+  self : ElevationIndex,
+  row : Int,
+  column : Int,
+  northing : Double,
+  easting : Double,
+) -> ElevationGridCell {
+  let mut hit_count = 0
+  let mut minimum = 0.0
+  let mut maximum = 0.0
+  if self.root is Some(root) {
+    root.visit_hits(northing, easting, fn(_, elevation) {
+      if hit_count == 0 {
+        minimum = elevation
+        maximum = elevation
+      } else {
+        minimum = minimum.min(elevation)
+        maximum = maximum.max(elevation)
+      }
+      hit_count += 1
+    })
+  }
+  {
+    row,
+    column,
+    northing,
+    easting,
+    hit_count,
+    min_elevation: if hit_count == 0 {
+      None
+    } else {
+      Some(minimum)
+    },
+    max_elevation: if hit_count == 0 {
+      None
+    } else {
+      Some(maximum)
+    },
+  }
+}
+
+///|
 /// Samples grid nodes in row-major order. When multiple faces cover a node,
 /// the result retains the elevation range and the full number of hits.
 pub fn ElevationIndex::sample_grid(
@@ -66,50 +122,16 @@ pub fn ElevationIndex::sample_grid(
   let cells = Array(capacity=spec.rows * spec.columns)
   let mut covered_cells = 0
   let mut overlapping_cells = 0
-  for row in 0..<spec.rows {
-    let northing = spec.northing + row.to_double() * spec.north_step
-    for column in 0..<spec.columns {
-      let easting = spec.easting + column.to_double() * spec.east_step
-      let mut hit_count = 0
-      let mut minimum = 0.0
-      let mut maximum = 0.0
-      if self.root is Some(root) {
-        root.visit_hits(northing, easting, fn(_, elevation) {
-          if hit_count == 0 {
-            minimum = elevation
-            maximum = elevation
-          } else {
-            minimum = minimum.min(elevation)
-            maximum = maximum.max(elevation)
-          }
-          hit_count += 1
-        })
+  spec.visit_nodes(fn(row, column, northing, easting) {
+    let cell = self.sample_grid_cell(row, column, northing, easting)
+    if cell.hit_count > 0 {
+      covered_cells += 1
+      if cell.hit_count > 1 {
+        overlapping_cells += 1
       }
-      if hit_count > 0 {
-        covered_cells += 1
-        if hit_count > 1 {
-          overlapping_cells += 1
-        }
-      }
-      cells.push({
-        row,
-        column,
-        northing,
-        easting,
-        hit_count,
-        min_elevation: if hit_count == 0 {
-          None
-        } else {
-          Some(minimum)
-        },
-        max_elevation: if hit_count == 0 {
-          None
-        } else {
-          Some(maximum)
-        },
-      })
     }
-  }
+    cells.push(cell)
+  })
   {
     spec,
     linear_unit: self.linear_unit,

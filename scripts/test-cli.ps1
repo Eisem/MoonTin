@@ -161,7 +161,11 @@ try {
     $tolerantDelta = Invoke-MoonTin ($gridDiffArgs + @('0.2', '--format', 'json')) 0
     Assert-Equal ($tolerantDelta.Stdout | ConvertFrom-Json).needs_review $false 'Grid comparison within tolerance'
 
-    Write-Output 'MoonTIN CLI integration checks passed (28 cases).'
+    $summaryDelta = Invoke-MoonTin ($gridDiffArgs + @('0.1')) 1
+    Assert-Equal ($summaryDelta.Stdout -match '1 raised, 0 lowered, 2 within tolerance, 0 ambiguous') $true 'Grid text summary counts'
+    Assert-Equal ($summaryDelta.Stdout -match '0 added, 0 lost, 1 uncovered in both revisions') $true 'Grid text coverage counts'
+
+    Write-Output 'MoonTIN CLI integration checks passed (29 cases).'
 } finally {
     Remove-Item -LiteralPath $stderrPath, $emptyPath
     Pop-Location

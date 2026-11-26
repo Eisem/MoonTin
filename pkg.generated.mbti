@@ -26,6 +26,8 @@ pub fn parse_records(String) -> ParsedTerrain raise
 
 pub fn sample_elevation(Terrain, Double, Double, surface_name? : String) -> ElevationSample raise SamplingError
 
+pub fn summarize_elevation_grid_delta(ElevationIndex, ElevationIndex, ElevationGridSpec, tolerance? : Double) -> GridChangeCounts raise SamplingError
+
 pub fn validate(Terrain, area_tolerance? : Double) -> Array[Diagnostic]
 
 pub fn write_landxml(Terrain, surface_name? : String, visible_only? : Bool, renumber_points? : Bool, metadata? : LandXmlMetadata) -> String raise
@@ -241,6 +243,7 @@ pub struct GridChangeCounts {
   coverage_lost : Int
   no_coverage : Int
 }
+pub fn GridChangeCounts::needs_review(Self) -> Bool
 pub fn GridChangeCounts::to_json(Self) -> Json
 
 pub(all) struct LandXmlMetadata {

@@ -88,9 +88,13 @@ fn compare_grid_cell(
 }
 
 ///|
-fn count_grid_changes(
-  cells : Array[ElevationGridDeltaCell],
-) -> GridChangeCounts {
+fn visit_grid_changes(
+  before : ElevationIndex,
+  after : ElevationIndex,
+  spec : ElevationGridSpec,
+  tolerance : Double,
+  visit : (ElevationGridDeltaCell) -> Unit,
+) -> GridChangeCounts raise SamplingError {
   let mut raised = 0
   let mut lowered = 0
   let mut within_tolerance = 0
@@ -98,7 +102,16 @@ fn count_grid_changes(
   let mut coverage_added = 0
   let mut coverage_lost = 0
   let mut no_coverage = 0
-  for cell in cells {
+  spec.visit_nodes(fn(
+    row,
+    column,
+    northing,
+    easting,
+  ) -> Unit raise SamplingError {
+    let old_cell = before.sample_grid_cell(row, column, northing, easting)
+    let new_cell = after.sample_grid_cell(row, column, northing, easting)
+    let cell = compare_grid_cell(old_cell, new_cell, tolerance)
+    visit(cell)
     match cell.change {
       Raised => raised += 1
       Lowered => lowered += 1
@@ -108,7 +121,7 @@ fn count_grid_changes(
       CoverageLost => coverage_lost += 1
       NoCoverage => no_coverage += 1
     }
-  }
+  })
   {
     raised,
     lowered,
@@ -130,6 +143,33 @@ pub fn compare_elevation_grids(
   spec : ElevationGridSpec,
   tolerance? : Double = 0.0,
 ) -> ElevationGridDelta raise SamplingError {
+  validate_grid_comparison(before, after, spec, tolerance)
+  let cells = Array(capacity=spec.rows * spec.columns)
+  let counts = visit_grid_changes(before, after, spec, tolerance, fn(cell) {
+    cells.push(cell)
+  })
+  { spec, linear_unit: before.linear_unit, tolerance, counts, cells, }
+}
+
+///|
+/// Compares grid coverage and elevation without retaining per-node details.
+pub fn summarize_elevation_grid_delta(
+  before : ElevationIndex,
+  after : ElevationIndex,
+  spec : ElevationGridSpec,
+  tolerance? : Double = 0.0,
+) -> GridChangeCounts raise SamplingError {
+  validate_grid_comparison(before, after, spec, tolerance)
+  visit_grid_changes(before, after, spec, tolerance, fn(_) { () })
+}
+
+///|
+fn validate_grid_comparison(
+  before : ElevationIndex,
+  after : ElevationIndex,
+  spec : ElevationGridSpec,
+  tolerance : Double,
+) -> Unit raise SamplingError {
   if before.linear_unit != after.linear_unit {
     raise InvalidSample(
       "grid comparison requires the same linear unit in both revisions",
@@ -140,19 +180,7 @@ pub fn compare_elevation_grids(
       "grid comparison tolerance must be finite and nonnegative",
     )
   }
-  let old_grid = before.sample_grid(spec)
-  let new_grid = after.sample_grid(spec)
-  let cells = Array(capacity=old_grid.cells.length())
-  for index, old_cell in old_grid.cells {
-    cells.push(compare_grid_cell(old_cell, new_grid.cells[index], tolerance))
-  }
-  {
-    spec,
-    linear_unit: before.linear_unit,
-    tolerance,
-    counts: count_grid_changes(cells),
-    cells,
-  }
+  check_grid_spec(spec)
 }
 
 ///|
@@ -171,7 +199,12 @@ pub fn GridChange::label(self : GridChange) -> String {
 ///|
 /// Reports differences that merit review, including unresolved overlaps.
 pub fn ElevationGridDelta::needs_review(self : ElevationGridDelta) -> Bool {
-  let counts = self.counts
+  self.counts.needs_review()
+}
+
+///|
+pub fn GridChangeCounts::needs_review(self : GridChangeCounts) -> Bool {
+  let counts = self
   counts.raised +
   counts.lowered +
   counts.ambiguous +
