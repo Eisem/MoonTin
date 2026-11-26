@@ -106,3 +106,11 @@ moon run cmd/main -- grid examples/terrain.xml 100 200 2 2 0.75 0.75 --format js
 ```
 
 参数依次为 Northing 起点、Easting 起点、行数、列数和两个方向的正间距。输出按行排列，行列序号从 0 开始，单次最多采样 100,000 个节点。无覆盖节点的高程为 `null`。多面命中的节点保留命中数和高程范围，便于识别重叠曲面或共享边。退出码 `0` 表示至少一个节点有覆盖，`1` 表示全部无覆盖，`2` 表示输入错误。
+
+### 重复高程查询基准
+
+```sh
+moon bench --target native --release --package eisem/moontin --file elevation_index_bench_wbtest.mbt
+```
+
+在 Windows 原生 Release 构建下，用包含 19,602 个三角面的 100 × 100 合成地形测量。建立索引平均约 24.02 ms。对同一批 100 个坐标，逐点调用直接扫描接口平均约 333.43 ms，复用已建索引平均约 0.064 ms。直接扫描会在每次调用时重新建立点 ID 表，复用索引的查询时间单列，未计入建索引时间。结果取决于查询分布与包围盒重叠程度。
