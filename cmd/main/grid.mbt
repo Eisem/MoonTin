@@ -49,3 +49,45 @@ async fn grid_file(
     0
   }
 }
+
+///|
+async fn grid_diff_files(
+  before_path : String,
+  after_path : String,
+  spec : @moontin.ElevationGridSpec,
+  tolerance : Double,
+  options : SampleOptions,
+) -> Int {
+  let before = @moontin.parse(read_input(before_path, 16 * 1024 * 1024))
+  let after = @moontin.parse(read_input(after_path, 16 * 1024 * 1024))
+  let before_index = @moontin.build_elevation_index(
+    before,
+    surface_name?=options.surface,
+  )
+  let after_index = @moontin.build_elevation_index(
+    after,
+    surface_name?=options.surface,
+  )
+  let report = @moontin.compare_elevation_grids(
+    before_index,
+    after_index,
+    spec,
+    tolerance~,
+  )
+  if options.json {
+    println(report.to_json().stringify())
+  } else {
+    let counts = report.counts
+    println(
+      "Elevations: \{counts.raised} raised, \{counts.lowered} lowered, \{counts.within_tolerance} within tolerance, \{counts.ambiguous} ambiguous.",
+    )
+    println(
+      "Coverage: \{counts.coverage_added} added, \{counts.coverage_lost} lost, \{counts.no_coverage} uncovered in both revisions.",
+    )
+  }
+  if report.needs_review() {
+    1
+  } else {
+    0
+  }
+}

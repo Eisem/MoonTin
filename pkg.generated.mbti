@@ -10,6 +10,8 @@ pub fn check(String, area_tolerance? : Double, strict? : Bool, max_diagnostics? 
 
 pub fn check_survey_points(Terrain, ArrayView[SurveyPoint], Double, surface_name? : String) -> SurveyReport raise SamplingError
 
+pub fn compare_elevation_grids(ElevationIndex, ElevationIndex, ElevationGridSpec, tolerance? : Double) -> ElevationGridDelta raise SamplingError
+
 pub fn compare_terrain(Terrain, Terrain, coordinate_tolerance? : Double, max_details? : Int) -> TerrainComparison raise ComparisonError
 
 pub fn elevation_profile(Terrain, (Double, Double), (Double, Double), surface_name? : String) -> ElevationProfile raise SamplingError
@@ -126,6 +128,25 @@ pub struct ElevationGridCell {
 }
 pub fn ElevationGridCell::to_json(Self) -> Json
 
+pub struct ElevationGridDelta {
+  spec : ElevationGridSpec
+  linear_unit : String?
+  tolerance : Double
+  counts : GridChangeCounts
+  cells : Array[ElevationGridDeltaCell]
+}
+pub fn ElevationGridDelta::needs_review(Self) -> Bool
+pub fn ElevationGridDelta::to_json(Self) -> Json
+
+pub struct ElevationGridDeltaCell {
+  before : ElevationGridCell
+  after : ElevationGridCell
+  change : GridChange
+  min_delta : Double?
+  max_delta : Double?
+}
+pub fn ElevationGridDeltaCell::to_json(Self) -> Json
+
 pub(all) struct ElevationGridSpec {
   northing : Double
   easting : Double
@@ -199,6 +220,28 @@ pub struct FaceReference {
   location : SourceLocation?
 }
 pub fn FaceReference::to_json(Self) -> Json
+
+pub(all) enum GridChange {
+  Raised
+  Lowered
+  WithinTolerance
+  Ambiguous
+  CoverageAdded
+  CoverageLost
+  NoCoverage
+}
+pub fn GridChange::label(Self) -> String
+
+pub struct GridChangeCounts {
+  raised : Int
+  lowered : Int
+  within_tolerance : Int
+  ambiguous : Int
+  coverage_added : Int
+  coverage_lost : Int
+  no_coverage : Int
+}
+pub fn GridChangeCounts::to_json(Self) -> Json
 
 pub(all) struct LandXmlMetadata {
   date : String?

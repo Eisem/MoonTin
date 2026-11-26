@@ -150,7 +150,18 @@ try {
     $invalidGrid = Invoke-MoonTin @('grid', 'examples/terrain.xml', '100', '200', '1001', '100', '1', '1') 2
     Assert-Equal ($invalidGrid.Stderr -match '100000 nodes') $true 'Grid node limit'
 
-    Write-Output 'MoonTIN CLI integration checks passed (26 cases).'
+    $gridDiffArgs = @('grid-diff', 'examples/terrain.xml', 'examples/terrain-revised.xml', '100', '200', '2', '2', '0.75', '0.75')
+    $delta = Invoke-MoonTin ($gridDiffArgs + @('0.1', '--format', 'json')) 1
+    $deltaReport = $delta.Stdout | ConvertFrom-Json
+    Assert-Equal $deltaReport.counts.raised 1 'Grid comparison raised count'
+    Assert-Equal $deltaReport.counts.within_tolerance 2 'Grid comparison tolerance count'
+    Assert-Equal $deltaReport.counts.no_coverage 1 'Grid comparison missing in both revisions'
+    Assert-Equal $deltaReport.cells[1].min_delta 0.1875 'Grid comparison elevation change'
+
+    $tolerantDelta = Invoke-MoonTin ($gridDiffArgs + @('0.2', '--format', 'json')) 0
+    Assert-Equal ($tolerantDelta.Stdout | ConvertFrom-Json).needs_review $false 'Grid comparison within tolerance'
+
+    Write-Output 'MoonTIN CLI integration checks passed (28 cases).'
 } finally {
     Remove-Item -LiteralPath $stderrPath, $emptyPath
     Pop-Location
