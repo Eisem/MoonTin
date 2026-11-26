@@ -93,13 +93,7 @@ pub fn sample_elevation(
         easting,
       )
       is Some(elevation) {
-      hits.push({
-        surface_number: triangle.surface_number,
-        surface_name: triangle.surface_name,
-        face_number: triangle.face_number,
-        elevation,
-        point_ids: [triangle.a.id, triangle.b.id, triangle.c.id],
-      })
+      hits.push(triangle_hit(triangle, elevation))
     }
   })
   { northing, easting, linear_unit: terrain.linear_unit, hits, }
@@ -183,5 +177,19 @@ pub fn ElevationSample::to_json(self : ElevationSample) -> Json {
       None => Json::null()
     },
     "hits": ToJson::to_json(self.hits.map(fn(hit) { hit.to_json() })),
+  }
+}
+
+///|
+fn triangle_hit(
+  triangle : SamplingTriangle,
+  elevation : Double,
+) -> ElevationHit {
+  {
+    surface_number: triangle.surface_number,
+    surface_name: triangle.surface_name,
+    face_number: triangle.face_number,
+    elevation,
+    point_ids: [triangle.a.id, triangle.b.id, triangle.c.id],
   }
 }

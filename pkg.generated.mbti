@@ -2,6 +2,8 @@
 package "eisem/moontin"
 
 // Values
+pub fn build_elevation_index(Terrain, surface_name? : String) -> ElevationIndex raise SamplingError
+
 pub fn build_mesh(Terrain, surface_name? : String, local_origin? : Bool) -> TerrainMesh raise SamplingError
 
 pub fn check(String, area_tolerance? : Double, strict? : Bool, max_diagnostics? : Int, max_records? : Int) -> CheckReport raise
@@ -111,6 +113,13 @@ pub struct ElevationHit {
   point_ids : Array[String]
 }
 pub fn ElevationHit::to_json(Self) -> Json
+
+pub struct ElevationIndex {
+  triangle_count : Int
+  linear_unit : String?
+  // private fields
+}
+pub fn ElevationIndex::sample(Self, Double, Double) -> ElevationSample raise SamplingError
 
 pub struct ElevationProfile {
   length : Double

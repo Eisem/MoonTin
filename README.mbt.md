@@ -96,3 +96,5 @@ moon run cmd/main -- rewrite examples/terrain.xml --timestamp 2026-11-21 09:00:0
 ```
 
 回写结果包含 MoonTIN 支持的 TIN 曲面、点、面和线性单位。默认保留测点 ID、三角面方向及可见性。`--visible-only` 移除隐藏面及其独用测点，`--renumber-points` 将每个曲面的测点重新编号为连续整数。`--timestamp DATE TIME` 和 `--project NAME` 可为交付文件补充元数据。回写的范围限于 TIN 数据，原文件的坐标参考系统、断裂线、路线及其他扩展元数据不会进入输出。往返测试验证 MoonTIN 可重读输出。
+
+调用方需要连续查询多个坐标时，可以先调用 `build_elevation_index` 建立可见面空间索引，再复用 `ElevationIndex::sample`。查询会跳过包围盒不包含该点的子树，返回与直接扫描相同的命中顺序。
