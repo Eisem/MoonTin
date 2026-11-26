@@ -98,3 +98,11 @@ moon run cmd/main -- rewrite examples/terrain.xml --timestamp 2026-11-21 09:00:0
 回写结果包含 MoonTIN 支持的 TIN 曲面、点、面和线性单位。默认保留测点 ID、三角面方向及可见性。`--visible-only` 移除隐藏面及其独用测点，`--renumber-points` 将每个曲面的测点重新编号为连续整数。`--timestamp DATE TIME` 和 `--project NAME` 可为交付文件补充元数据。回写的范围限于 TIN 数据，原文件的坐标参考系统、断裂线、路线及其他扩展元数据不会进入输出。往返测试验证 MoonTIN 可重读输出。
 
 调用方需要连续查询多个坐标时，可以先调用 `build_elevation_index` 建立可见面空间索引，再复用 `ElevationIndex::sample`。查询会跳过包围盒不包含该点的子树，返回与直接扫描相同的命中顺序。
+
+## 采样规则高程网格
+
+```sh
+moon run cmd/main -- grid examples/terrain.xml 100 200 2 2 0.75 0.75 --format json
+```
+
+参数依次为 Northing 起点、Easting 起点、行数、列数和两个方向的正间距。输出按行排列，行列序号从 0 开始，单次最多采样 100,000 个节点。无覆盖节点的高程为 `null`。多面命中的节点保留命中数和高程范围，便于识别重叠曲面或共享边。退出码 `0` 表示至少一个节点有覆盖，`1` 表示全部无覆盖，`2` 表示输入错误。

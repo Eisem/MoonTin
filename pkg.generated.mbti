@@ -105,6 +105,37 @@ pub(all) struct Diagnostic {
 }
 pub fn Diagnostic::to_json(Self) -> Json
 
+pub struct ElevationGrid {
+  spec : ElevationGridSpec
+  linear_unit : String?
+  covered_cells : Int
+  uncovered_cells : Int
+  overlapping_cells : Int
+  cells : Array[ElevationGridCell]
+}
+pub fn ElevationGrid::to_json(Self) -> Json
+
+pub struct ElevationGridCell {
+  row : Int
+  column : Int
+  northing : Double
+  easting : Double
+  hit_count : Int
+  min_elevation : Double?
+  max_elevation : Double?
+}
+pub fn ElevationGridCell::to_json(Self) -> Json
+
+pub(all) struct ElevationGridSpec {
+  northing : Double
+  easting : Double
+  rows : Int
+  columns : Int
+  north_step : Double
+  east_step : Double
+}
+pub fn ElevationGridSpec::to_json(Self) -> Json
+
 pub struct ElevationHit {
   surface_number : Int
   surface_name : String
@@ -120,6 +151,7 @@ pub struct ElevationIndex {
   // private fields
 }
 pub fn ElevationIndex::sample(Self, Double, Double) -> ElevationSample raise SamplingError
+pub fn ElevationIndex::sample_grid(Self, ElevationGridSpec) -> ElevationGrid raise SamplingError
 
 pub struct ElevationProfile {
   length : Double

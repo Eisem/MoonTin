@@ -89,11 +89,11 @@ fn SampleTree::build(entries : Array[IndexTriangle]) -> SampleTree {
 }
 
 ///|
-fn SampleTree::find(
+fn SampleTree::visit_hits(
   self : SampleTree,
   north : Double,
   east : Double,
-  hits : Array[ElevationHit],
+  visit : (SamplingTriangle, Double) -> Unit,
 ) -> Unit {
   match self {
     Leaf(bounds, entries) =>
@@ -109,15 +109,15 @@ fn SampleTree::find(
                 east,
               )
               is Some(elevation) {
-              hits.push(triangle_hit(triangle, elevation))
+              visit(triangle, elevation)
             }
           }
         }
       }
     Branch(bounds, left, right) =>
       if bounds.contains(north, east) {
-        left.find(north, east, hits)
-        right.find(north, east, hits)
+        left.visit_hits(north, east, visit)
+        right.visit_hits(north, east, visit)
       }
   }
 }
@@ -163,7 +163,9 @@ pub fn ElevationIndex::sample(
   }
   let hits = []
   if self.root is Some(root) {
-    root.find(northing, easting, hits)
+    root.visit_hits(northing, easting, fn(triangle, elevation) {
+      hits.push(triangle_hit(triangle, elevation))
+    })
     hits.sort_by(fn(a, b) {
       let surface = a.surface_number.compare(b.surface_number)
       if surface == 0 {

@@ -140,7 +140,17 @@ try {
     $badDate = Invoke-MoonTin @('rewrite', 'examples/terrain.xml', '--timestamp', '2025-02-29', '10:20:30') 2
     Assert-Equal ($badDate.Stderr -match 'timestamp requires') $true 'Invalid LandXML date'
 
-    Write-Output 'MoonTIN CLI integration checks passed (24 cases).'
+    $grid = Invoke-MoonTin @('grid', 'examples/terrain.xml', '100', '200', '2', '2', '0.75', '0.75', '--format', 'json') 0
+    $gridReport = $grid.Stdout | ConvertFrom-Json
+    Assert-Equal $gridReport.covered_cells 3 'Grid covered nodes'
+    Assert-Equal $gridReport.uncovered_cells 1 'Grid uncovered nodes'
+    Assert-Equal $gridReport.cells[2].max_elevation 11.5 'Grid indexed elevation'
+    Assert-Equal ($null -eq $gridReport.cells[3].min_elevation) $true 'Grid no-data elevation'
+
+    $invalidGrid = Invoke-MoonTin @('grid', 'examples/terrain.xml', '100', '200', '1001', '100', '1', '1') 2
+    Assert-Equal ($invalidGrid.Stderr -match '100000 nodes') $true 'Grid node limit'
+
+    Write-Output 'MoonTIN CLI integration checks passed (26 cases).'
 } finally {
     Remove-Item -LiteralPath $stderrPath, $emptyPath
     Pop-Location

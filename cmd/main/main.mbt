@@ -184,6 +184,23 @@ async fn main {
           end_east,
           parse_sample_options(options),
         )
+      [
+        _,
+        "grid",
+        path,
+        north,
+        east,
+        rows,
+        columns,
+        north_step,
+        east_step,
+        .. options,
+      ] =>
+        grid_file(
+          path,
+          parse_grid_spec(north, east, rows, columns, north_step, east_step),
+          parse_sample_options(options),
+        )
       [_, "sample", path, north, east, .. options] =>
         sample_file(path, north, east, parse_sample_options(options))
       [_, "diff", before, after, .. options] =>
@@ -209,6 +226,9 @@ async fn main {
         )
         eprintln(
           "       moontin profile <terrain.xml> <start-north> <start-east> <end-north> <end-east> [--surface NAME] [--format text|json]",
+        )
+        eprintln(
+          "       moontin grid <terrain.xml> <north> <east> <rows> <columns> <north-step> <east-step> [--surface NAME] [--format text|json]",
         )
         eprintln(
           "       moontin sample <terrain.xml> <northing> <easting> [--surface NAME] [--format text|json]",
