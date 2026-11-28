@@ -2,6 +2,19 @@
 
 MoonTIN 检查 LandXML 1.2 地形曲面的测点引用、投影退化和三角面拓扑。
 
+## 工具链兼容性
+
+MoonTIN 已在 Windows 上用 MoonBit 1.0 RC1（`moonc v1.0.0-rc1+3c0520448`）验证原生库、CLI 和 Mooncakes 打包。Linux CI 分别使用这一固定版本和官方 `latest` 工具链运行相同的原生测试。可用 `moon version --all` 查看本机的编译器版本。
+
+在 Linux 或 macOS 上复现 RC1 环境：
+
+```sh
+curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash -s -- '1.0.0-rc1+3c0520448'
+moon update
+```
+
+## 快速验证
+
 ```sh
 moon run cmd/main -- check examples/terrain.xml
 moon run cmd/main -- check examples/missing-point.xml --format json
