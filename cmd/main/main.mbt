@@ -1,5 +1,5 @@
 ///|
-async fn check_file(path : String, options : CheckOptions) -> Int {
+async fn check_file(path : String, options : CheckOptions) -> Int32 {
   let report = @moontin.check(
     read_input(path, options.max_input_bytes),
     area_tolerance=options.area_tolerance,
@@ -64,9 +64,9 @@ async fn check_file(path : String, options : CheckOptions) -> Int {
 priv struct CheckOptions {
   json : Bool
   strict : Bool
-  max_diagnostics : Int
-  max_input_bytes : Int
-  max_records : Int
+  max_diagnostics : Int32
+  max_input_bytes : Int32
+  max_records : Int32
   area_tolerance : Double
 }
 

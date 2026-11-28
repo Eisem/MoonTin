@@ -39,7 +39,7 @@ fn parse_contour_options(
 }
 
 ///|
-async fn contour_file(path : String, options : ContourOptions) -> Int {
+async fn contour_file(path : String, options : ContourOptions) -> Int32 {
   let terrain = @moontin.parse(read_input(path, 16 * 1024 * 1024))
   let report = @moontin.extract_contours(
     terrain,

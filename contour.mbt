@@ -6,7 +6,7 @@ pub struct ContourPoint {
 
 ///|
 pub struct ContourPath {
-  surface_number : Int
+  surface_number : Int32
   surface_name : String
   elevation : Double
   closed : Bool
@@ -18,7 +18,7 @@ pub struct ContourReport {
   linear_unit : String?
   levels : Array[Double]
   paths : Array[ContourPath]
-  skipped_flat_faces : Int
+  skipped_flat_faces : Int32
 }
 
 ///|
@@ -29,20 +29,20 @@ priv struct ContourEndpoint {
 
 ///|
 priv struct ContourEdge {
-  first : Int
-  second : Int
+  first : Int32
+  second : Int32
 }
 
 ///|
 priv struct ContourGraph {
-  surface_number : Int
+  surface_number : Int32
   surface_name : String
   elevation : Double
-  index : Map[(String, String), Int]
+  index : Map[(String, String), Int32]
   points : Array[ContourPoint]
-  adjacency : Array[Array[Int]]
+  adjacency : Array[Array[Int32]]
   edges : Array[ContourEdge]
-  edge_keys : Map[(Int, Int), Bool]
+  edge_keys : Map[(Int32, Int32), Bool]
 }
 
 ///|
@@ -124,7 +124,10 @@ fn triangle_contour(
 }
 
 ///|
-fn ContourGraph::vertex(self : ContourGraph, endpoint : ContourEndpoint) -> Int {
+fn ContourGraph::vertex(
+  self : ContourGraph,
+  endpoint : ContourEndpoint,
+) -> Int32 {
   if self.index.get(endpoint.key) is Some(index) {
     return index
   }
@@ -156,8 +159,8 @@ fn ContourGraph::add(
 ///|
 fn ContourGraph::trace(
   self : ContourGraph,
-  start : Int,
-  first_edge : Int,
+  start : Int32,
+  first_edge : Int32,
   visited : FixedArray[Bool],
 ) -> ContourPath {
   let points = [self.points[start]]
@@ -216,7 +219,7 @@ fn ContourGraph::paths(self : ContourGraph) -> Array[ContourPath] {
 }
 
 ///|
-fn first_contour_level(levels : Array[Double], elevation : Double) -> Int {
+fn first_contour_level(levels : Array[Double], elevation : Double) -> Int32 {
   let mut low = 0
   let mut high = levels.length()
   while low < high {
@@ -237,7 +240,7 @@ pub fn extract_contours(
   terrain : Terrain,
   requested_levels : ArrayView[Double],
   surface_name? : String,
-  max_segments? : Int = 500000,
+  max_segments~ : Int32 = 500000,
 ) -> ContourReport raise SamplingError {
   if requested_levels.is_empty() || max_segments < 1 {
     raise InvalidSample("contours require levels and a positive segment budget")
@@ -252,7 +255,7 @@ pub fn extract_contours(
       raise InvalidSample("contour levels must be distinct")
     }
   }
-  let graphs : Map[(Int, Int), ContourGraph] = Map([])
+  let graphs : Map[(Int32, Int32), ContourGraph] = Map([])
   let mut skipped_flat_faces = 0
   let mut emitted = 0
   let mut problem = None

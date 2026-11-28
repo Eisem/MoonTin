@@ -8,7 +8,7 @@ priv struct SampleOptions {
 ///|
 fn parse_sample_options(
   args : ArrayView[String],
-  allow_jsonl? : Bool = false,
+  allow_jsonl~ : Bool = false,
 ) -> SampleOptions raise {
   let mut surface = None
   let mut json = false
@@ -54,7 +54,7 @@ async fn sample_file(
   north : String,
   east : String,
   options : SampleOptions,
-) -> Int {
+) -> Int32 {
   let northing = query_coordinate("northing", north)
   let easting = query_coordinate("easting", east)
   let terrain = @moontin.parse(read_input(path, 16 * 1024 * 1024))

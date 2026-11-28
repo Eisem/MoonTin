@@ -2,8 +2,8 @@
 priv struct DiffOptions {
   json : Bool
   coordinate_tolerance : Double
-  max_details : Int
-  max_input_bytes : Int
+  max_details : Int32
+  max_input_bytes : Int32
 }
 
 ///|
@@ -55,7 +55,7 @@ async fn diff_files(
   before_path : String,
   after_path : String,
   options : DiffOptions,
-) -> Int {
+) -> Int32 {
   let before = @moontin.parse(read_input(before_path, options.max_input_bytes))
   let after = @moontin.parse(read_input(after_path, options.max_input_bytes))
   let comparison = @moontin.compare_terrain(

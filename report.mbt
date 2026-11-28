@@ -25,18 +25,18 @@ pub extend Bounds with ToJson::{to_json}
 
 ///|
 pub struct SurfaceSummary {
-  surface_number : Int
+  surface_number : Int32
   name : String
-  decoded_points : Int
-  decoded_faces : Int
-  invisible_faces : Int
-  indexed_faces : Int
-  skipped_visible_faces : Int
-  usable_points : Int
-  boundary_edges : Int
-  boundary_loops : Int
-  branched_boundaries : Int
-  connected_components : Int
+  decoded_points : Int32
+  decoded_faces : Int32
+  invisible_faces : Int32
+  indexed_faces : Int32
+  skipped_visible_faces : Int32
+  usable_points : Int32
+  boundary_edges : Int32
+  boundary_loops : Int32
+  branched_boundaries : Int32
+  connected_components : Int32
   bounds : Bounds?
   geometry : FaceGeometry
 }
@@ -44,11 +44,11 @@ pub struct SurfaceSummary {
 ///|
 fn summarize_surface(
   surface : Surface,
-  surface_number : Int,
+  surface_number : Int32,
   points : Map[String, Point],
   ambiguous : Map[String, Bool],
   topology : SurfaceTopology,
-  visible_face_count : Int,
+  visible_face_count : Int32,
   boundary : BoundarySummary,
   geometry : FaceGeometry,
 ) -> SurfaceSummary {
@@ -135,8 +135,8 @@ pub struct CheckReport {
   linear_unit : String?
   area_tolerance : Double
   strict : Bool
-  error_count : Int
-  warning_count : Int
+  error_count : Int32
+  warning_count : Int32
   truncated : Bool
   record_issues : Array[RecordIssue]
   diagnostics : Array[Diagnostic]
@@ -145,10 +145,10 @@ pub struct CheckReport {
 ///|
 pub fn check(
   source : String,
-  area_tolerance? : Double = 0.0,
-  strict? : Bool = false,
-  max_diagnostics? : Int = 1000,
-  max_records? : Int = 500000,
+  area_tolerance~ : Double = 0.0,
+  strict~ : Bool = false,
+  max_diagnostics~ : Int32 = 1000,
+  max_records~ : Int32 = 500000,
 ) -> CheckReport raise {
   if max_records <= 0 {
     raise InvalidLandXml("record limit must be positive")

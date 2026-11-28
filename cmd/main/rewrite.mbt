@@ -55,7 +55,7 @@ fn parse_rewrite_options(args : ArrayView[String]) -> RewriteOptions raise {
 }
 
 ///|
-async fn rewrite_file(path : String, options : RewriteOptions) -> Int {
+async fn rewrite_file(path : String, options : RewriteOptions) -> Int32 {
   let terrain = @moontin.parse(read_input(path, 16 * 1024 * 1024))
   let source = @moontin.write_landxml(
     terrain,

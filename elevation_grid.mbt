@@ -4,19 +4,19 @@
 pub(all) struct ElevationGridSpec {
   northing : Double
   easting : Double
-  rows : Int
-  columns : Int
+  rows : Int32
+  columns : Int32
   north_step : Double
   east_step : Double
 }
 
 ///|
 pub struct ElevationGridCell {
-  row : Int
-  column : Int
+  row : Int32
+  column : Int32
   northing : Double
   easting : Double
-  hit_count : Int
+  hit_count : Int32
   min_elevation : Double?
   max_elevation : Double?
 }
@@ -25,9 +25,9 @@ pub struct ElevationGridCell {
 pub struct ElevationGrid {
   spec : ElevationGridSpec
   linear_unit : String?
-  covered_cells : Int
-  uncovered_cells : Int
-  overlapping_cells : Int
+  covered_cells : Int32
+  uncovered_cells : Int32
+  overlapping_cells : Int32
   cells : Array[ElevationGridCell]
 }
 
@@ -58,7 +58,7 @@ fn check_grid_spec(spec : ElevationGridSpec) -> Unit raise SamplingError {
 ///|
 fn ElevationGridSpec::visit_nodes(
   self : ElevationGridSpec,
-  visit : (Int, Int, Double, Double) -> Unit raise SamplingError,
+  visit : (Int32, Int32, Double, Double) -> Unit raise SamplingError,
 ) -> Unit raise SamplingError {
   for row in 0..<self.rows {
     let northing = self.northing + row.to_double() * self.north_step
@@ -72,8 +72,8 @@ fn ElevationGridSpec::visit_nodes(
 ///|
 fn ElevationIndex::sample_grid_cell(
   self : ElevationIndex,
-  row : Int,
-  column : Int,
+  row : Int32,
+  column : Int32,
   northing : Double,
   easting : Double,
 ) -> ElevationGridCell {

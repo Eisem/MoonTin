@@ -39,8 +39,8 @@ pub fn Diagnostic::to_json(self : Diagnostic) -> Json {
 
 ///|
 pub struct SourceLocation {
-  line : Int
-  column : Int
+  line : Int32
+  column : Int32
 }
 
 ///|
@@ -51,12 +51,12 @@ pub fn SourceLocation::to_json(self : SourceLocation) -> Json {
 ///|
 priv struct SurfaceLocations {
   points : Array[SourceLocation]
-  faces : Map[Int, SourceLocation]
+  faces : Map[Int32, SourceLocation]
 }
 
 ///|
 pub struct FaceReference {
-  number : Int
+  number : Int32
   location : SourceLocation?
 }
 

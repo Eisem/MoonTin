@@ -13,9 +13,9 @@ pub struct MeshVertex {
 
 ///|
 pub struct MeshFace {
-  surface_number : Int
-  face_number : Int
-  vertices : (Int, Int, Int)
+  surface_number : Int32
+  face_number : Int32
+  vertices : (Int32, Int32, Int32)
 }
 
 ///|
@@ -30,17 +30,17 @@ pub struct TerrainMesh {
 priv struct MeshBuilder {
   vertices : Array[MeshVertex]
   faces : Array[MeshFace]
-  point_indexes : Map[(Int, String), Int]
-  face_keys : Map[(Int, Int, Int), Bool]
+  point_indexes : Map[(Int32, String), Int32]
+  face_keys : Map[(Int32, Int32, Int32), Bool]
   origin : MeshVertex
 }
 
 ///|
 fn MeshBuilder::index(
   self : MeshBuilder,
-  surface_number : Int,
+  surface_number : Int32,
   point : Point,
-) -> Int {
+) -> Int32 {
   let key = (surface_number, point.id)
   if self.point_indexes.get(key) is Some(index) {
     return index
@@ -61,7 +61,7 @@ fn MeshBuilder::index(
 pub fn build_mesh(
   terrain : Terrain,
   surface_name? : String,
-  local_origin? : Bool = false,
+  local_origin~ : Bool = false,
 ) -> TerrainMesh raise SamplingError {
   let mut state : MeshBuilder? = None
   let mut problem = None

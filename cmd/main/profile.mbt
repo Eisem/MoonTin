@@ -6,7 +6,7 @@ async fn profile_file(
   end_north : String,
   end_east : String,
   options : SampleOptions,
-) -> Int {
+) -> Int32 {
   let start = (
     query_coordinate("start northing", start_north),
     query_coordinate("start easting", start_east),

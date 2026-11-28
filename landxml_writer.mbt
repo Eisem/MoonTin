@@ -183,8 +183,8 @@ fn write_landxml_surface(
 pub fn write_landxml(
   terrain : Terrain,
   surface_name? : String,
-  visible_only? : Bool = false,
-  renumber_points? : Bool = false,
+  visible_only~ : Bool = false,
+  renumber_points~ : Bool = false,
   metadata? : LandXmlMetadata,
 ) -> String raise {
   let units = match terrain.linear_unit {

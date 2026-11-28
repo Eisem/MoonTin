@@ -53,7 +53,7 @@ fn parse_volume_options(
 }
 
 ///|
-async fn volume_file(path : String, options : VolumeOptions) -> Int {
+async fn volume_file(path : String, options : VolumeOptions) -> Int32 {
   let terrain = @moontin.parse(read_input(path, 16 * 1024 * 1024))
   let report = @moontin.estimate_volume(
     terrain,

@@ -4,8 +4,8 @@ pub struct FaceGeometry {
   surface_area : Double?
   min_grade_percent : Double?
   max_grade_percent : Double?
-  measured_faces : Int
-  overflow_faces : Int
+  measured_faces : Int32
+  overflow_faces : Int32
 }
 
 ///|
@@ -14,8 +14,8 @@ priv struct GeometryAccumulator {
   mut surface_area : Double
   mut min_grade : Double?
   mut max_grade : Double?
-  mut measured_faces : Int
-  mut overflow_faces : Int
+  mut measured_faces : Int32
+  mut overflow_faces : Int32
 }
 
 ///|

@@ -1,24 +1,28 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "eisem/moontin"
 
+import {
+  "moonbitlang/core/json",
+}
+
 // Values
 pub fn build_elevation_index(Terrain, surface_name? : String) -> ElevationIndex raise SamplingError
 
 pub fn build_mesh(Terrain, surface_name? : String, local_origin? : Bool) -> TerrainMesh raise SamplingError
 
-pub fn check(String, area_tolerance? : Double, strict? : Bool, max_diagnostics? : Int, max_records? : Int) -> CheckReport raise
+pub fn check(String, area_tolerance? : Double, strict? : Bool, max_diagnostics? : Int32, max_records? : Int32) -> CheckReport raise
 
 pub fn check_survey_points(Terrain, ArrayView[SurveyPoint], Double, surface_name? : String) -> SurveyReport raise SamplingError
 
 pub fn compare_elevation_grids(ElevationIndex, ElevationIndex, ElevationGridSpec, tolerance? : Double) -> ElevationGridDelta raise SamplingError
 
-pub fn compare_terrain(Terrain, Terrain, coordinate_tolerance? : Double, max_details? : Int) -> TerrainComparison raise ComparisonError
+pub fn compare_terrain(Terrain, Terrain, coordinate_tolerance? : Double, max_details? : Int32) -> TerrainComparison raise ComparisonError
 
 pub fn elevation_profile(Terrain, (Double, Double), (Double, Double), surface_name? : String) -> ElevationProfile raise SamplingError
 
 pub fn estimate_volume(Terrain, ReferencePlane, surface_name? : String) -> VolumeReport raise SamplingError
 
-pub fn extract_contours(Terrain, ArrayView[Double], surface_name? : String, max_segments? : Int) -> ContourReport raise SamplingError
+pub fn extract_contours(Terrain, ArrayView[Double], surface_name? : String, max_segments? : Int32) -> ContourReport raise SamplingError
 
 pub fn parse(String) -> Terrain raise
 
@@ -60,77 +64,77 @@ pub struct Bounds {
   min_elevation : Double
   max_elevation : Double
 }
-pub fn Bounds::to_json(Self) -> Json
-pub impl ToJson for Bounds
+pub fn Bounds::to_json(Self) -> @json.Json
+pub impl @json.ToJson for Bounds
 
 pub struct CheckReport {
   surfaces : Array[SurfaceSummary]
   linear_unit : String?
   area_tolerance : Double
   strict : Bool
-  error_count : Int
-  warning_count : Int
+  error_count : Int32
+  warning_count : Int32
   truncated : Bool
   record_issues : Array[RecordIssue]
   diagnostics : Array[Diagnostic]
 }
 pub fn CheckReport::passed(Self) -> Bool
-pub fn CheckReport::to_json(Self) -> Json
+pub fn CheckReport::to_json(Self) -> @json.Json
 
 pub struct ContourPath {
-  surface_number : Int
+  surface_number : Int32
   surface_name : String
   elevation : Double
   closed : Bool
   points : Array[ContourPoint]
 }
-pub fn ContourPath::to_json(Self) -> Json
+pub fn ContourPath::to_json(Self) -> @json.Json
 
 pub struct ContourPoint {
   northing : Double
   easting : Double
 }
-pub fn ContourPoint::to_json(Self) -> Json
+pub fn ContourPoint::to_json(Self) -> @json.Json
 
 pub struct ContourReport {
   linear_unit : String?
   levels : Array[Double]
   paths : Array[ContourPath]
-  skipped_flat_faces : Int
+  skipped_flat_faces : Int32
 }
-pub fn ContourReport::to_json(Self) -> Json
+pub fn ContourReport::to_json(Self) -> @json.Json
 
 pub(all) struct Diagnostic {
   rule : Rule
-  surface_number : Int
+  surface_number : Int32
   surface_name : String
-  face_number : Int?
+  face_number : Int32?
   point_ids : Array[String]
   location : SourceLocation?
   related_faces : Array[FaceReference]
 }
-pub fn Diagnostic::to_json(Self) -> Json
+pub fn Diagnostic::to_json(Self) -> @json.Json
 
 pub struct ElevationGrid {
   spec : ElevationGridSpec
   linear_unit : String?
-  covered_cells : Int
-  uncovered_cells : Int
-  overlapping_cells : Int
+  covered_cells : Int32
+  uncovered_cells : Int32
+  overlapping_cells : Int32
   cells : Array[ElevationGridCell]
 }
-pub fn ElevationGrid::to_json(Self) -> Json
+pub fn ElevationGrid::to_json(Self) -> @json.Json
 
 pub struct ElevationGridCell {
-  row : Int
-  column : Int
+  row : Int32
+  column : Int32
   northing : Double
   easting : Double
-  hit_count : Int
+  hit_count : Int32
   min_elevation : Double?
   max_elevation : Double?
 }
-pub fn ElevationGridCell::to_json(Self) -> Json
+pub fn ElevationGridCell::to_json(Self) -> @json.Json
 
 pub struct ElevationGridDelta {
   spec : ElevationGridSpec
@@ -140,7 +144,7 @@ pub struct ElevationGridDelta {
   cells : Array[ElevationGridDeltaCell]
 }
 pub fn ElevationGridDelta::needs_review(Self) -> Bool
-pub fn ElevationGridDelta::to_json(Self) -> Json
+pub fn ElevationGridDelta::to_json(Self) -> @json.Json
 
 pub struct ElevationGridDeltaCell {
   before : ElevationGridCell
@@ -149,29 +153,29 @@ pub struct ElevationGridDeltaCell {
   min_delta : Double?
   max_delta : Double?
 }
-pub fn ElevationGridDeltaCell::to_json(Self) -> Json
+pub fn ElevationGridDeltaCell::to_json(Self) -> @json.Json
 
 pub(all) struct ElevationGridSpec {
   northing : Double
   easting : Double
-  rows : Int
-  columns : Int
+  rows : Int32
+  columns : Int32
   north_step : Double
   east_step : Double
 }
-pub fn ElevationGridSpec::to_json(Self) -> Json
+pub fn ElevationGridSpec::to_json(Self) -> @json.Json
 
 pub struct ElevationHit {
-  surface_number : Int
+  surface_number : Int32
   surface_name : String
-  face_number : Int
+  face_number : Int32
   elevation : Double
   point_ids : Array[String]
 }
-pub fn ElevationHit::to_json(Self) -> Json
+pub fn ElevationHit::to_json(Self) -> @json.Json
 
 pub struct ElevationIndex {
-  triangle_count : Int
+  triangle_count : Int32
   linear_unit : String?
   // private fields
 }
@@ -185,7 +189,7 @@ pub struct ElevationProfile {
   segments : Array[ProfileSegment]
   gaps : Array[ProfileRange]
 }
-pub fn ElevationProfile::to_json(Self) -> Json
+pub fn ElevationProfile::to_json(Self) -> @json.Json
 
 pub struct ElevationSample {
   northing : Double
@@ -193,7 +197,7 @@ pub struct ElevationSample {
   linear_unit : String?
   hits : Array[ElevationHit]
 }
-pub fn ElevationSample::to_json(Self) -> Json
+pub fn ElevationSample::to_json(Self) -> @json.Json
 
 pub(all) struct Face {
   vertices : (String, String, String)
@@ -202,28 +206,28 @@ pub(all) struct Face {
 
 pub struct FaceChange {
   vertices : Array[String]
-  before_number : Int
-  after_number : Int
+  before_number : Int32
+  after_number : Int32
   winding_changed : Bool
   visibility_changed : Bool
 }
-pub fn FaceChange::to_json(Self) -> Json
+pub fn FaceChange::to_json(Self) -> @json.Json
 
 pub struct FaceGeometry {
   projected_area : Double?
   surface_area : Double?
   min_grade_percent : Double?
   max_grade_percent : Double?
-  measured_faces : Int
-  overflow_faces : Int
+  measured_faces : Int32
+  overflow_faces : Int32
 }
-pub fn FaceGeometry::to_json(Self) -> Json
+pub fn FaceGeometry::to_json(Self) -> @json.Json
 
 pub struct FaceReference {
-  number : Int
+  number : Int32
   location : SourceLocation?
 }
-pub fn FaceReference::to_json(Self) -> Json
+pub fn FaceReference::to_json(Self) -> @json.Json
 
 pub(all) enum GridChange {
   Raised
@@ -237,16 +241,16 @@ pub(all) enum GridChange {
 pub fn GridChange::label(Self) -> String
 
 pub struct GridChangeCounts {
-  raised : Int
-  lowered : Int
-  within_tolerance : Int
-  ambiguous : Int
-  coverage_added : Int
-  coverage_lost : Int
-  no_coverage : Int
+  raised : Int32
+  lowered : Int32
+  within_tolerance : Int32
+  ambiguous : Int32
+  coverage_added : Int32
+  coverage_lost : Int32
+  no_coverage : Int32
 }
 pub fn GridChangeCounts::needs_review(Self) -> Bool
-pub fn GridChangeCounts::to_json(Self) -> Json
+pub fn GridChangeCounts::to_json(Self) -> @json.Json
 
 pub(all) struct LandXmlMetadata {
   date : String?
@@ -256,9 +260,9 @@ pub(all) struct LandXmlMetadata {
 }
 
 pub struct MeshFace {
-  surface_number : Int
-  face_number : Int
-  vertices : (Int, Int, Int)
+  surface_number : Int32
+  face_number : Int32
+  vertices : (Int32, Int32, Int32)
 }
 
 pub(all) enum MeshFormat {
@@ -275,7 +279,7 @@ pub struct MeshVertex {
 pub struct ParsedTerrain {
   terrain : Terrain
   issues : Array[RecordIssue]
-  face_numbers : Array[Array[Int]]
+  face_numbers : Array[Array[Int32]]
 }
 
 pub(all) struct Point {
@@ -290,36 +294,36 @@ pub struct PointChange {
   before : Point
   after : Point
 }
-pub fn PointChange::to_json(Self) -> Json
+pub fn PointChange::to_json(Self) -> @json.Json
 
 pub struct ProfileRange {
   start_distance : Double
   end_distance : Double
 }
-pub fn ProfileRange::to_json(Self) -> Json
+pub fn ProfileRange::to_json(Self) -> @json.Json
 
 pub struct ProfileSegment {
-  surface_number : Int
+  surface_number : Int32
   surface_name : String
-  face_number : Int
+  face_number : Int32
   start_distance : Double
   end_distance : Double
   start_elevation : Double
   end_elevation : Double
 }
-pub fn ProfileSegment::to_json(Self) -> Json
+pub fn ProfileSegment::to_json(Self) -> @json.Json
 
 pub(all) struct RecordIssue {
-  surface_number : Int
+  surface_number : Int32
   surface_name : String
   code : String
   record_kind : String
-  record_number : Int
+  record_number : Int32
   message : String
   severity : Severity
   location : SourceLocation
 }
-pub fn RecordIssue::to_json(Self) -> Json
+pub fn RecordIssue::to_json(Self) -> @json.Json
 
 pub(all) struct ReferencePlane {
   northing : Double
@@ -328,7 +332,7 @@ pub(all) struct ReferencePlane {
   north_grade : Double
   east_grade : Double
 }
-pub fn ReferencePlane::to_json(Self) -> Json
+pub fn ReferencePlane::to_json(Self) -> @json.Json
 
 pub(all) enum Rule {
   DuplicatePoint
@@ -352,10 +356,10 @@ pub(all) enum Severity {
 pub fn Severity::label(Self) -> String
 
 pub struct SourceLocation {
-  line : Int
-  column : Int
+  line : Int32
+  column : Int32
 }
-pub fn SourceLocation::to_json(Self) -> Json
+pub fn SourceLocation::to_json(Self) -> @json.Json
 
 pub(all) struct Surface {
   name : String
@@ -366,12 +370,12 @@ pub(all) struct Surface {
 pub struct SurfaceComparison {
   name : String
   status : String
-  added_point_count : Int
-  removed_point_count : Int
-  moved_point_count : Int
-  added_face_count : Int
-  removed_face_count : Int
-  changed_face_count : Int
+  added_point_count : Int32
+  removed_point_count : Int32
+  moved_point_count : Int32
+  added_face_count : Int32
+  removed_face_count : Int32
+  changed_face_count : Int32
   added_points : Array[String]
   removed_points : Array[String]
   moved_points : Array[PointChange]
@@ -380,25 +384,25 @@ pub struct SurfaceComparison {
   changed_faces : Array[FaceChange]
   truncated : Bool
 }
-pub fn SurfaceComparison::to_json(Self) -> Json
+pub fn SurfaceComparison::to_json(Self) -> @json.Json
 
 pub struct SurfaceSummary {
-  surface_number : Int
+  surface_number : Int32
   name : String
-  decoded_points : Int
-  decoded_faces : Int
-  invisible_faces : Int
-  indexed_faces : Int
-  skipped_visible_faces : Int
-  usable_points : Int
-  boundary_edges : Int
-  boundary_loops : Int
-  branched_boundaries : Int
-  connected_components : Int
+  decoded_points : Int32
+  decoded_faces : Int32
+  invisible_faces : Int32
+  indexed_faces : Int32
+  skipped_visible_faces : Int32
+  usable_points : Int32
+  boundary_edges : Int32
+  boundary_loops : Int32
+  branched_boundaries : Int32
+  connected_components : Int32
   bounds : Bounds?
   geometry : FaceGeometry
 }
-pub fn SurfaceSummary::to_json(Self) -> Json
+pub fn SurfaceSummary::to_json(Self) -> @json.Json
 
 pub(all) struct SurveyPoint {
   id : String
@@ -410,24 +414,24 @@ pub(all) struct SurveyPoint {
 pub struct SurveyReport {
   linear_unit : String?
   tolerance : Double
-  passed_count : Int
-  outside_tolerance_count : Int
-  uncovered_count : Int
+  passed_count : Int32
+  outside_tolerance_count : Int32
+  uncovered_count : Int32
   results : Array[SurveyResult]
 }
 pub fn SurveyReport::passed(Self) -> Bool
-pub fn SurveyReport::to_json(Self) -> Json
+pub fn SurveyReport::to_json(Self) -> @json.Json
 
 pub struct SurveyResult {
   point : SurveyPoint
   status : SurveyStatus
-  hit_count : Int
+  hit_count : Int32
   min_elevation : Double?
   max_elevation : Double?
   worst_hit : ElevationHit?
   max_absolute_error : Double?
 }
-pub fn SurveyResult::to_json(Self) -> Json
+pub fn SurveyResult::to_json(Self) -> @json.Json
 
 pub(all) enum SurveyStatus {
   Passed
@@ -447,7 +451,7 @@ pub struct TerrainComparison {
   surfaces : Array[SurfaceComparison]
 }
 pub fn TerrainComparison::changed(Self) -> Bool
-pub fn TerrainComparison::to_json(Self) -> Json
+pub fn TerrainComparison::to_json(Self) -> @json.Json
 
 pub struct TerrainMesh {
   vertices : Array[MeshVertex]
@@ -464,23 +468,23 @@ pub struct VolumeReport {
   cut : Double
   fill : Double
 }
-pub fn VolumeReport::to_json(Self) -> Json
+pub fn VolumeReport::to_json(Self) -> @json.Json
 
 pub struct VolumeSurface {
-  number : Int
+  number : Int32
   name : String
-  faces : Int
-  above_faces : Int
-  below_faces : Int
-  crossing_faces : Int
-  coincident_faces : Int
+  faces : Int32
+  above_faces : Int32
+  below_faces : Int32
+  crossing_faces : Int32
+  coincident_faces : Int32
   projected_area : Double
   above_area : Double
   below_area : Double
   cut : Double
   fill : Double
 }
-pub fn VolumeSurface::to_json(Self) -> Json
+pub fn VolumeSurface::to_json(Self) -> @json.Json
 
 // Type aliases
 

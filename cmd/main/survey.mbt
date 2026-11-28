@@ -41,7 +41,7 @@ async fn survey_file(
   survey_path : String,
   tolerance_text : String,
   options : SampleOptions,
-) -> Int {
+) -> Int32 {
   let tolerance = query_coordinate("tolerance", tolerance_text)
   let points = decode_survey_points(read_input(survey_path, 16 * 1024 * 1024))
   let terrain = @moontin.parse(read_input(terrain_path, 16 * 1024 * 1024))

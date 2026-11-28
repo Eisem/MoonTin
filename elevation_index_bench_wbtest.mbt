@@ -1,10 +1,10 @@
 ///|
-fn bench_grid_point_id(row : Int, column : Int) -> String {
+fn bench_grid_point_id(row : Int32, column : Int32) -> String {
   "\{row}/\{column}"
 }
 
 ///|
-fn bench_elevation_terrain(size : Int) -> Terrain {
+fn bench_elevation_terrain(size : Int32) -> Terrain {
   let points : Array[Point] = []
   let faces : Array[Face] = []
   for row in 0..<size {

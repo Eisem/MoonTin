@@ -125,7 +125,7 @@ fn SampleTree::visit_hits(
 ///|
 /// A snapshot of visible TIN triangles for repeated elevation queries.
 pub struct ElevationIndex {
-  triangle_count : Int
+  triangle_count : Int32
   linear_unit : String?
   priv root : SampleTree?
 }

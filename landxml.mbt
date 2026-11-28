@@ -81,7 +81,7 @@ fn retain_xml_node(
 }
 
 ///|
-fn read_xml(source : String, max_records : Int) -> XmlNode raise {
+fn read_xml(source : String, max_records : Int32) -> XmlNode raise {
   if source.contains("<!DOCTYPE") {
     raise InvalidLandXml("DOCTYPE declarations are unsupported")
   }
@@ -193,7 +193,11 @@ fn tokens(text : String) -> Array[String] {
 }
 
 ///|
-fn decode_point(node : XmlNode, surface : String, number : Int) -> Point raise {
+fn decode_point(
+  node : XmlNode,
+  surface : String,
+  number : Int32,
+) -> Point raise {
   let location = "surface \{surface}, point #\{number}"
   if node.attribute("pntRef") is Some(_) {
     raise InvalidLandXml(
@@ -222,7 +226,7 @@ fn decode_point(node : XmlNode, surface : String, number : Int) -> Point raise {
 }
 
 ///|
-fn decode_face(node : XmlNode, surface : String, number : Int) -> Face raise {
+fn decode_face(node : XmlNode, surface : String, number : Int32) -> Face raise {
   let location = "surface \{surface}, face #\{number}"
   guard !node.has_child_elements else {
     raise InvalidLandXml("\{location}: unexpected XML inside face record")
@@ -241,11 +245,11 @@ fn decode_face(node : XmlNode, surface : String, number : Int) -> Face raise {
 
 ///|
 pub(all) struct RecordIssue {
-  surface_number : Int
+  surface_number : Int32
   surface_name : String
   code : String
   record_kind : String
-  record_number : Int
+  record_number : Int32
   message : String
   severity : Severity
   location : SourceLocation
@@ -255,7 +259,7 @@ pub(all) struct RecordIssue {
 pub struct ParsedTerrain {
   terrain : Terrain
   issues : Array[RecordIssue]
-  face_numbers : Array[Array[Int]]
+  face_numbers : Array[Array[Int32]]
 }
 
 ///|
@@ -281,9 +285,9 @@ pub fn parse_records(source : String) -> ParsedTerrain raise {
 ///|
 fn decode_records(
   source : String,
-  max_records : Int,
+  max_records : Int32,
   emit : (RecordIssue) -> Unit,
-) -> (Terrain, Array[Array[Int]], Array[Int], Array[SurfaceLocations]) raise {
+) -> (Terrain, Array[Array[Int32]], Array[Int32], Array[SurfaceLocations]) raise {
   let root = read_xml(source, max_records)
   guard root.name == "LandXML" && root.attribute("version") == Some("1.2") else {
     raise InvalidLandXml("expected a LandXML 1.2 document")

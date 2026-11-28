@@ -17,7 +17,7 @@ pub(all) enum SurveyStatus {
 pub struct SurveyResult {
   point : SurveyPoint
   status : SurveyStatus
-  hit_count : Int
+  hit_count : Int32
   min_elevation : Double?
   max_elevation : Double?
   worst_hit : ElevationHit?
@@ -28,15 +28,15 @@ pub struct SurveyResult {
 pub struct SurveyReport {
   linear_unit : String?
   tolerance : Double
-  passed_count : Int
-  outside_tolerance_count : Int
-  uncovered_count : Int
+  passed_count : Int32
+  outside_tolerance_count : Int32
+  uncovered_count : Int32
   results : Array[SurveyResult]
 }
 
 ///|
 priv struct SurveyHitAccumulator {
-  mut count : Int
+  mut count : Int32
   mut min_elevation : Double
   mut max_elevation : Double
   mut worst_error : Double
@@ -122,11 +122,11 @@ fn SurveyHitAccumulator::result(
 ///|
 priv struct SurveyIndexEntry {
   coordinate : Double
-  point_index : Int
+  point_index : Int32
 }
 
 ///|
-fn compare_survey_entry(a : SurveyIndexEntry, b : SurveyIndexEntry) -> Int {
+fn compare_survey_entry(a : SurveyIndexEntry, b : SurveyIndexEntry) -> Int32 {
   let coordinate_order = a.coordinate.compare(b.coordinate)
   if coordinate_order == 0 {
     a.point_index.compare(b.point_index)
@@ -140,7 +140,7 @@ fn survey_index_bound(
   entries : Array[SurveyIndexEntry],
   coordinate : Double,
   inclusive_upper : Bool,
-) -> Int {
+) -> Int32 {
   let mut low = 0
   let mut high = entries.length()
   while low < high {

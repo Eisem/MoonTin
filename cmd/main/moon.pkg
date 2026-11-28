@@ -4,7 +4,6 @@ import {
   "eisem/moontin",
   "moonbitlang/core/env",
   "moonbitlang/async/fs",
-  "moonbitlang/async",
   "moonbitlang/core/encoding/utf8",
   "moonbitlang/x/sys",
 }

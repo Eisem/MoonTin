@@ -43,9 +43,9 @@ pub(all) enum Rule {
 ///|
 pub(all) struct Diagnostic {
   rule : Rule
-  surface_number : Int
+  surface_number : Int32
   surface_name : String
-  face_number : Int?
+  face_number : Int32?
   point_ids : Array[String]
   location : SourceLocation?
   related_faces : Array[FaceReference]
@@ -54,7 +54,7 @@ pub(all) struct Diagnostic {
 ///|
 pub fn validate(
   terrain : Terrain,
-  area_tolerance? : Double = 0.0,
+  area_tolerance~ : Double = 0.0,
 ) -> Array[Diagnostic] {
   let diagnostics = []
   terrain.surfaces.eachi(fn(index, surface) {
@@ -75,17 +75,17 @@ pub fn validate(
 ///|
 fn validate_surface(
   surface : Surface,
-  surface_number : Int,
+  surface_number : Int32,
   area_tolerance : Double,
   emit : (Diagnostic) -> Unit,
-  face_numbers : Array[Int]?,
+  face_numbers : Array[Int32]?,
   locations : SurfaceLocations?,
 ) -> SurfaceSummary {
   let points : Map[String, Point] = Map([])
   let ambiguous : Map[String, Bool] = Map([])
   let topology = SurfaceTopology::new()
   let geometry = GeometryAccumulator::new()
-  let emit_face = fn(rule, face_number, point_ids, related : Array[Int]) {
+  let emit_face = fn(rule, face_number, point_ids, related : Array[Int32]) {
     let location = match (locations, face_number) {
       (Some(source), Some(number)) => source.faces.get(number)
       _ => None

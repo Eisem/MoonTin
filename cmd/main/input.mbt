@@ -1,12 +1,12 @@
 ///|
 priv suberror InputError {
-  InputTooLarge(Int)
+  InputTooLarge(Int32)
   InputChanged
   InvalidUtf8
 }
 
 ///|
-async fn read_input(path : String, limit : Int) -> String {
+async fn read_input(path : String, limit : Int32) -> String {
   let file = @fs.open(path[:], mode=ReadOnly)
   defer file.close()
   let size = file.size()

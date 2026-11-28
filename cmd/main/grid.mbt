@@ -1,5 +1,5 @@
 ///|
-fn grid_dimension(axis : String, value : String) -> Int raise {
+fn grid_dimension(axis : String, value : String) -> Int32 raise {
   @string.parse_int(value[:]) catch {
     _ => raise InvalidOption("invalid grid \{axis}: \{value}")
   }
@@ -29,7 +29,7 @@ async fn grid_file(
   path : String,
   spec : @moontin.ElevationGridSpec,
   options : SampleOptions,
-) -> Int {
+) -> Int32 {
   let terrain = @moontin.parse(read_input(path, 16 * 1024 * 1024))
   let index = @moontin.build_elevation_index(
     terrain,
@@ -57,7 +57,7 @@ async fn grid_diff_files(
   spec : @moontin.ElevationGridSpec,
   tolerance : Double,
   options : SampleOptions,
-) -> Int {
+) -> Int32 {
   let before = @moontin.parse(read_input(before_path, 16 * 1024 * 1024))
   let after = @moontin.parse(read_input(after_path, 16 * 1024 * 1024))
   let before_index = @moontin.build_elevation_index(

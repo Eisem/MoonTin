@@ -9,7 +9,7 @@ pub(all) struct LandXmlMetadata {
 }
 
 ///|
-fn parse_timestamp_part(text : StringView, width : Int) -> Int? {
+fn parse_timestamp_part(text : StringView, width : Int32) -> Int32? {
   if text.length() != width {
     return None
   }

@@ -5,9 +5,9 @@ pub suberror SamplingError {
 
 ///|
 pub struct ElevationHit {
-  surface_number : Int
+  surface_number : Int32
   surface_name : String
-  face_number : Int
+  face_number : Int32
   elevation : Double
   point_ids : Array[String]
 }
@@ -101,9 +101,9 @@ pub fn sample_elevation(
 
 ///|
 priv struct SamplingTriangle {
-  surface_number : Int
+  surface_number : Int32
   surface_name : String
-  face_number : Int
+  face_number : Int32
   a : Point
   b : Point
   c : Point

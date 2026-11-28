@@ -1,7 +1,7 @@
 ///|
 fn sample_terrain(
   vertices : (String, String, String),
-  visible? : Bool = true,
+  visible~ : Bool = true,
 ) -> Terrain {
   {
     linear_unit: Some("meter"),

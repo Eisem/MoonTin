@@ -1,8 +1,8 @@
 ///|
 pub struct ProfileSegment {
-  surface_number : Int
+  surface_number : Int32
   surface_name : String
-  face_number : Int
+  face_number : Int32
   start_distance : Double
   end_distance : Double
   start_elevation : Double

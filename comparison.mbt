@@ -13,8 +13,8 @@ pub struct PointChange {
 ///|
 pub struct FaceChange {
   vertices : Array[String]
-  before_number : Int
-  after_number : Int
+  before_number : Int32
+  after_number : Int32
   winding_changed : Bool
   visibility_changed : Bool
 }
@@ -23,12 +23,12 @@ pub struct FaceChange {
 pub struct SurfaceComparison {
   name : String
   status : String
-  added_point_count : Int
-  removed_point_count : Int
-  moved_point_count : Int
-  added_face_count : Int
-  removed_face_count : Int
-  changed_face_count : Int
+  added_point_count : Int32
+  removed_point_count : Int32
+  moved_point_count : Int32
+  added_face_count : Int32
+  removed_face_count : Int32
+  changed_face_count : Int32
   added_points : Array[String]
   removed_points : Array[String]
   moved_points : Array[PointChange]
@@ -47,7 +47,7 @@ pub struct TerrainComparison {
 
 ///|
 priv struct IndexedFace {
-  number : Int
+  number : Int32
   forward : Bool
   visible : Bool
 }
@@ -117,7 +117,7 @@ fn compare_faces(
 
 ///|
 priv struct ChangeBudget {
-  mut remaining : Int
+  mut remaining : Int32
   mut truncated : Bool
 }
 
@@ -137,7 +137,7 @@ fn compare_surface(
   before : Surface?,
   after : Surface?,
   tolerance : Double,
-  limit : Int,
+  limit : Int32,
 ) -> SurfaceComparison raise ComparisonError {
   let old_points = match before {
     Some(surface) => compare_points(surface)
@@ -282,8 +282,8 @@ fn[K : Compare + Hash + Eq, V] sorted_keys(
 pub fn compare_terrain(
   before : Terrain,
   after : Terrain,
-  coordinate_tolerance? : Double = 0.0,
-  max_details? : Int = 1000,
+  coordinate_tolerance~ : Double = 0.0,
+  max_details~ : Int32 = 1000,
 ) -> TerrainComparison raise ComparisonError {
   if coordinate_tolerance < 0.0 ||
     coordinate_tolerance.is_nan() ||

@@ -1,19 +1,19 @@
 ///|
 priv struct BoundaryLink {
   neighbor : String
-  face_number : Int
+  face_number : Int32
 }
 
 ///|
 priv struct BoundarySummary {
-  closed_loops : Int
-  branched_components : Int
+  closed_loops : Int32
+  branched_components : Int32
 }
 
 ///|
 fn SurfaceTopology::check_boundary(
   self : SurfaceTopology,
-  emit : (Rule, Int?, Array[String], Array[Int]) -> Unit,
+  emit : (Rule, Int32?, Array[String], Array[Int32]) -> Unit,
 ) -> BoundarySummary {
   let adjacency : Map[String, Array[BoundaryLink]] = Map([])
   let nonmanifold_vertices : Map[String, Bool] = Map([])
@@ -77,7 +77,7 @@ fn add_boundary_link(
   adjacency : Map[String, Array[BoundaryLink]],
   point : String,
   neighbor : String,
-  face_number : Int,
+  face_number : Int32,
 ) -> Unit {
   let link = BoundaryLink::{ neighbor, face_number, }
   match adjacency.get(point) {

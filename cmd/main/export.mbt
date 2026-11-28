@@ -36,7 +36,7 @@ fn parse_mesh_options(args : ArrayView[String]) -> MeshOptions raise {
 }
 
 ///|
-async fn export_mesh(path : String, options : MeshOptions) -> Int {
+async fn export_mesh(path : String, options : MeshOptions) -> Int32 {
   let terrain = @moontin.parse(read_input(path, 16 * 1024 * 1024))
   let mesh = @moontin.build_mesh(
     terrain,

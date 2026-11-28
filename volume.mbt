@@ -9,13 +9,13 @@ pub(all) struct ReferencePlane {
 
 ///|
 pub struct VolumeSurface {
-  number : Int
+  number : Int32
   name : String
-  faces : Int
-  above_faces : Int
-  below_faces : Int
-  crossing_faces : Int
-  coincident_faces : Int
+  faces : Int32
+  above_faces : Int32
+  below_faces : Int32
+  crossing_faces : Int32
+  coincident_faces : Int32
   projected_area : Double
   above_area : Double
   below_area : Double
@@ -34,13 +34,13 @@ pub struct VolumeReport {
 
 ///|
 priv struct VolumeAccumulator {
-  number : Int
+  number : Int32
   name : String
-  mut faces : Int
-  mut above_faces : Int
-  mut below_faces : Int
-  mut crossing_faces : Int
-  mut coincident_faces : Int
+  mut faces : Int32
+  mut above_faces : Int32
+  mut below_faces : Int32
+  mut crossing_faces : Int32
+  mut coincident_faces : Int32
   mut projected_area : Double
   mut above_area : Double
   mut below_area : Double
@@ -270,7 +270,7 @@ pub fn estimate_volume(
     ].all(finite_sample_value) {
     raise InvalidSample("reference plane parameters must be finite")
   }
-  let accumulators : Map[Int, VolumeAccumulator] = Map([])
+  let accumulators : Map[Int32, VolumeAccumulator] = Map([])
   let mut problem = None
   each_visible_triangle(terrain, surface_name, fn(triangle) {
     if problem is Some(_) {

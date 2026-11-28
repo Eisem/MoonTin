@@ -1,12 +1,12 @@
 ///|
 priv struct EdgeUse {
-  face_number : Int
+  face_number : Int32
   forward : Bool
 }
 
 ///|
 priv struct SurfaceTopology {
-  faces : Map[(String, String, String), Int]
+  faces : Map[(String, String, String), Int32]
   edges : Map[(String, String), Array[EdgeUse]]
 }
 
@@ -19,8 +19,8 @@ fn SurfaceTopology::new() -> SurfaceTopology {
 fn SurfaceTopology::add_face(
   self : SurfaceTopology,
   vertices : (String, String, String),
-  face_number : Int,
-  emit : (Rule, Int?, Array[String], Array[Int]) -> Unit,
+  face_number : Int32,
+  emit : (Rule, Int32?, Array[String], Array[Int32]) -> Unit,
 ) -> Bool {
   let (a, b, c) = vertices
   let ids = [a, b, c]
@@ -42,7 +42,7 @@ fn SurfaceTopology::add_edge(
   self : SurfaceTopology,
   start : String,
   end : String,
-  face_number : Int,
+  face_number : Int32,
 ) -> Unit {
   let forward = start < end
   let key = if forward { (start, end) } else { (end, start) }
@@ -56,7 +56,7 @@ fn SurfaceTopology::add_edge(
 ///|
 fn SurfaceTopology::check_edges(
   self : SurfaceTopology,
-  emit : (Rule, Int?, Array[String], Array[Int]) -> Unit,
+  emit : (Rule, Int32?, Array[String], Array[Int32]) -> Unit,
 ) -> Unit {
   self.edges.each(fn(edge, uses) {
     let (a, b) = edge
@@ -82,7 +82,7 @@ fn SurfaceTopology::check_edges(
 }
 
 ///|
-fn SurfaceTopology::summarize(self : SurfaceTopology) -> (Int, Int) {
+fn SurfaceTopology::summarize(self : SurfaceTopology) -> (Int32, Int32) {
   let mut highest_face = 0
   self.faces.each(fn(_, number) { highest_face = highest_face.max(number) })
   // A negative entry identifies a root and stores the negated set size.
@@ -107,7 +107,7 @@ fn SurfaceTopology::summarize(self : SurfaceTopology) -> (Int, Int) {
 }
 
 ///|
-fn component_root(parents : FixedArray[Int], face : Int) -> Int {
+fn component_root(parents : FixedArray[Int32], face : Int32) -> Int32 {
   let mut root = face
   while parents[root] >= 0 {
     root = parents[root]
@@ -123,10 +123,10 @@ fn component_root(parents : FixedArray[Int], face : Int) -> Int {
 
 ///|
 fn merge_components(
-  parents : FixedArray[Int],
-  first : Int,
-  second : Int,
-) -> Int {
+  parents : FixedArray[Int32],
+  first : Int32,
+  second : Int32,
+) -> Int32 {
   let (large, small) = if parents[first] <= parents[second] {
     (first, second)
   } else {

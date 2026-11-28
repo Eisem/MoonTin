@@ -20,13 +20,13 @@ pub struct ElevationGridDeltaCell {
 
 ///|
 pub struct GridChangeCounts {
-  raised : Int
-  lowered : Int
-  within_tolerance : Int
-  ambiguous : Int
-  coverage_added : Int
-  coverage_lost : Int
-  no_coverage : Int
+  raised : Int32
+  lowered : Int32
+  within_tolerance : Int32
+  ambiguous : Int32
+  coverage_added : Int32
+  coverage_lost : Int32
+  no_coverage : Int32
 }
 
 ///|
@@ -141,7 +141,7 @@ pub fn compare_elevation_grids(
   before : ElevationIndex,
   after : ElevationIndex,
   spec : ElevationGridSpec,
-  tolerance? : Double = 0.0,
+  tolerance~ : Double = 0.0,
 ) -> ElevationGridDelta raise SamplingError {
   validate_grid_comparison(before, after, spec, tolerance)
   let cells = Array(capacity=spec.rows * spec.columns)
@@ -157,7 +157,7 @@ pub fn summarize_elevation_grid_delta(
   before : ElevationIndex,
   after : ElevationIndex,
   spec : ElevationGridSpec,
-  tolerance? : Double = 0.0,
+  tolerance~ : Double = 0.0,
 ) -> GridChangeCounts raise SamplingError {
   validate_grid_comparison(before, after, spec, tolerance)
   visit_grid_changes(before, after, spec, tolerance, fn(_) { () })
@@ -171,7 +171,7 @@ pub fn visit_elevation_grid_delta(
   after : ElevationIndex,
   spec : ElevationGridSpec,
   on_cell : (ElevationGridDeltaCell) -> Unit,
-  tolerance? : Double = 0.0,
+  tolerance~ : Double = 0.0,
 ) -> GridChangeCounts raise SamplingError {
   validate_grid_comparison(before, after, spec, tolerance)
   visit_grid_changes(before, after, spec, tolerance, on_cell)
